@@ -88,7 +88,7 @@
       <h2 class="auth-title" id="auth-title">Sign In to Play</h2>
       <p class="auth-subtitle">Earn rewards, level up &amp; climb the leaderboard</p>
 
-      <!-- Google Sign-In -->
+      <!-- Google Sign-In — uses redirect (works on mobile, no popup block) -->
       <button id="btn-google-signin" class="btn-google" aria-label="Sign in with Google">
         <svg class="google-icon" width="20" height="20" viewBox="0 0 18 18" aria-hidden="true">
           <path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z"/>
@@ -96,8 +96,20 @@
           <path fill="#FBBC05" d="M3.964 10.707A5.41 5.41 0 013.682 9c0-.593.102-1.17.282-1.707V4.961H.957A8.996 8.996 0 000 9c0 1.452.348 2.827.957 4.039l3.007-2.332z"/>
           <path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 00.957 4.96l3.007 2.332C4.672 5.163 6.656 3.58 9 3.58z"/>
         </svg>
-        Continue with Google
+        <span id="signin-btn-text">Continue with Google</span>
       </button>
+
+      <!-- Shown while redirect is happening -->
+      <div id="auth-loading" style="display:none;text-align:center;padding:10px 0 4px;">
+        <div style="display:inline-block;width:22px;height:22px;border:2px solid rgba(0,212,255,0.2);
+          border-top-color:#00d4ff;border-radius:50%;animation:spin 0.7s linear infinite;"></div>
+        <p style="font-size:0.76rem;color:#8b9ab8;margin-top:8px;">Redirecting to Google…</p>
+      </div>
+
+      <!-- Error message box (hidden by default, shown on failure) -->
+      <div id="auth-error-msg" style="display:none;background:rgba(255,68,68,0.1);
+        border:1px solid rgba(255,68,68,0.3);border-radius:10px;padding:10px 14px;
+        font-size:0.8rem;color:#ff6b6b;text-align:center;line-height:1.5;"></div>
 
       <!-- Referral code (optional) -->
       <div class="referral-row">
@@ -115,6 +127,14 @@
 
       <p class="auth-bonus-note">🎁 New accounts get 20–100 bonus EXP on first login!</p>
       <p class="auth-legal">By signing in you accept our <button class="link-btn" id="btn-reopen-terms">Terms &amp; Conditions</button></p>
+
+      <!-- Guest / skip option -->
+      <button id="btn-guest-play" style="margin-top:10px;width:100%;background:none;
+        border:1px solid rgba(255,255,255,0.1);border-radius:9999px;color:#4a5568;
+        font-family:'Rajdhani',sans-serif;font-size:0.8rem;font-weight:600;
+        padding:10px;cursor:pointer;transition:border-color 0.25s,color 0.25s;">
+        Continue as Guest (limited features)
+      </button>
     </div>
   </div>
 
@@ -628,24 +648,74 @@
        onclick on the Continue button works immediately, even before
        the ES module scripts have finished loading.
   ───────────────────────────────────────────────────────────────── -->
-  <script>
-    function closeTerms() {
-      // Hide the terms overlay
-      var overlay = document.getElementById('terms-overlay');
-      if (overlay) overlay.classList.add('hidden');
+  <style>
+    /* Spinner keyframe used by the auth loading indicator */
+    @keyframes spin { to { transform: rotate(360deg); } }
 
-      // Remember that the user accepted (auth.js also does this,
-      // but we do it here too as a safety net)
+    /* Guest button hover */
+    #btn-guest-play:hover {
+      border-color: rgba(255,255,255,0.25) !important;
+      color: #8b9ab8 !important;
+    }
+  </style>
+
+  <script>
+    /* ── closeTerms ─────────────────────────────────────────────
+       Called by the Continue button onclick BEFORE modules load.
+       Hides terms overlay and shows auth modal.                  */
+    function closeTerms() {
+      var overlay    = document.getElementById('terms-overlay');
+      var authModal  = document.getElementById('auth-overlay');
+      var avatar     = document.getElementById('user-avatar-btn');
+
+      if (overlay) overlay.classList.add('hidden');
       try { localStorage.setItem('ns_terms_accepted', '1'); } catch(e) {}
 
-      // Show the auth modal if the user isn't signed in yet.
-      // We check for the user-avatar button being hidden as a proxy.
-      var avatar = document.getElementById('user-avatar-btn');
-      var authOverlay = document.getElementById('auth-overlay');
-      if (authOverlay && avatar && avatar.classList.contains('hidden')) {
-        authOverlay.classList.remove('hidden');
+      // Only show auth if user is not already signed in
+      if (authModal && avatar && avatar.classList.contains('hidden')) {
+        authModal.classList.remove('hidden');
       }
     }
+
+    /* ── showAuthError ──────────────────────────────────────────
+       Exposed globally so auth.js (module) can call it.         */
+    function showAuthError(msg) {
+      var box = document.getElementById('auth-error-msg');
+      var loading = document.getElementById('auth-loading');
+      var btn = document.getElementById('btn-google-signin');
+      var btnText = document.getElementById('signin-btn-text');
+      if (box)     { box.textContent = msg; box.style.display = 'block'; }
+      if (loading) { loading.style.display = 'none'; }
+      if (btn)     { btn.disabled = false; }
+      if (btnText) { btnText.textContent = 'Continue with Google'; }
+    }
+    window.showAuthError = showAuthError;
+
+    /* ── showAuthLoading ────────────────────────────────────────
+       Shows spinner and disables button during redirect.        */
+    function showAuthLoading() {
+      var box     = document.getElementById('auth-error-msg');
+      var loading = document.getElementById('auth-loading');
+      var btn     = document.getElementById('btn-google-signin');
+      var btnText = document.getElementById('signin-btn-text');
+      if (box)     { box.style.display = 'none'; }
+      if (loading) { loading.style.display = 'block'; }
+      if (btn)     { btn.disabled = true; }
+      if (btnText) { btnText.textContent = 'Redirecting…'; }
+    }
+    window.showAuthLoading = showAuthLoading;
+
+    /* ── Guest mode ─────────────────────────────────────────────
+       Closes auth modal and lets user play without signing in.  */
+    document.addEventListener('DOMContentLoaded', function() {
+      var guestBtn = document.getElementById('btn-guest-play');
+      if (guestBtn) {
+        guestBtn.addEventListener('click', function() {
+          var authModal = document.getElementById('auth-overlay');
+          if (authModal) authModal.classList.add('hidden');
+        });
+      }
+    });
   </script>
 
   <!-- ─────────────────────────────────────────────────────────────
