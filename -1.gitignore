@@ -1,0 +1,194 @@
+# ─────────────────────────────────────────────────────────────
+# NeonSpin — .gitignore
+# GitHub Pages project (pure HTML/CSS/JS — no build step)
+# ─────────────────────────────────────────────────────────────
+
+
+# ── Operating System ─────────────────────────────────────────
+
+# macOS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+.AppleDouble
+.LSOverride
+Icon?
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+Desktop.ini
+$RECYCLE.BIN/
+*.lnk
+
+# Linux
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
+
+
+# ── Editors & IDEs ───────────────────────────────────────────
+
+# VS Code
+.vscode/
+!.vscode/extensions.json
+!.vscode/settings.json.example
+
+# JetBrains (WebStorm, IntelliJ)
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Vim / Neovim
+*.swp
+*.swo
+*~
+Session.vim
+.netrwhist
+
+# Emacs
+*~
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+auto-save-list
+tramp
+.\#*
+
+
+# ── Node / npm ───────────────────────────────────────────────
+# (Only needed if you add Firebase CLI, tooling, or a bundler)
+
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.pnpm-store/
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+.npmrc
+
+
+# ── Firebase CLI ─────────────────────────────────────────────
+
+# Firebase service account key — NEVER commit this
+*-adminsdk-*.json
+serviceAccountKey.json
+firebase-service-account.json
+.firebase/
+firebase-debug.log
+firebase-debug.*.log
+firestore-debug.log
+database-debug.log
+ui-debug.log
+
+# Firebase emulator data
+.runtimeconfig.json
+
+
+# ── Environment & Secrets ────────────────────────────────────
+# If you ever add a build step or server-side code,
+# these files must NEVER be committed.
+
+.env
+.env.local
+.env.development
+.env.development.local
+.env.test
+.env.test.local
+.env.production
+.env.production.local
+.env.*.local
+*.pem
+*.key
+secrets.json
+secrets.js
+
+
+# ── Build Outputs ────────────────────────────────────────────
+# (Not used now, but added for future tooling)
+
+dist/
+build/
+out/
+.cache/
+.parcel-cache/
+.next/
+.nuxt/
+.svelte-kit/
+.output/
+.vite/
+
+
+# ── Testing ──────────────────────────────────────────────────
+
+coverage/
+.nyc_output/
+*.lcov
+test-results/
+playwright-report/
+.playwright/
+
+
+# ── Logs & Temp Files ────────────────────────────────────────
+
+logs/
+*.log
+*.tmp
+*.temp
+*.bak
+*.backup
+*.orig
+
+
+# ── Archives ─────────────────────────────────────────────────
+# Prevent accidentally committing ZIP exports of the project
+
+*.zip
+*.tar
+*.tar.gz
+*.rar
+*.7z
+
+
+# ── GitHub Pages specific ────────────────────────────────────
+
+# If you use a custom CNAME for your GitHub Pages domain,
+# the CNAME file SHOULD be committed (not ignored).
+# This line is intentionally absent.
+
+# Jekyll build output (not used, but safe to ignore)
+_site/
+.sass-cache/
+.jekyll-cache/
+.jekyll-metadata
+
+
+# ── Project-specific ─────────────────────────────────────────
+
+# Local dev notes that shouldn't be public
+TODO.local.md
+NOTES.local.md
+scratch.js
+scratch.html
+
+# Old/backup versions of source files
+*.old
+*.v1.js
+*.v2.js
+*.backup.js
+*.backup.css
