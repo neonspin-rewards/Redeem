@@ -53,8 +53,6 @@ import { lsGet } from './utils.js';
 
 /* ═══════════════════════════════════════════════════════════════
    BOOT
-   Wait for the DOM to be fully parsed before running anything.
-   (ES modules are deferred by default, so this is a safety net.)
 ═══════════════════════════════════════════════════════════════ */
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', boot);
@@ -63,72 +61,81 @@ if (document.readyState === 'loading') {
 }
 
 async function boot() {
-  /* ── Step 1: Apply saved theme immediately ───────────────
-     Do this before anything renders to prevent a flash of
-     the wrong theme on page load.                          */
-  loadTheme();
+  console.log('[NeonSpin] Step 1: Boot started');
 
-  /* ── Step 2: Handle Google redirect return ───────────────
-     Must be called FIRST on every page load.
-     If the user just returned from Google sign-in,
-     this picks up the auth result and hides the auth modal. */
-  handleRedirectResult().catch((e) => {
-  console.error("Redirect error:", e);
-});
+  // ── HARD FALLBACK ─────────────────────────────────────────
+  // If ANYTHING in boot() stalls or throws and the loading
+  // screen is still visible after 5 seconds, force-hide it.
+  // This is the ultimate safety net — app is always usable.
+  const hardFallback = setTimeout(() => {
+    console.warn('[NeonSpin] Hard fallback: force-hiding loading screen after 5s');
+    hideLoadingScreen();
+  }, 5000);
 
-  /* ── Step 3: Initialise the spin wheel & game state ─────
-     Pass a callback (onStateChange) so spin.js can sync
-     to Firebase whenever coins/EXP change — without
-     importing auth.js (avoids circular dependency).
+  try {
+    // Step 1: Theme (synchronous — cannot fail)
+    loadTheme();
+    console.log('[NeonSpin] Step 2: Theme loaded');
 
-     FIX: drawWheel is called inside initSpin via requestAnimationFrame
-     so the canvas has time to be laid out by CSS before we measure it. */
-  initSpin({
-    onStateChange: (state) => syncUserStats(state),
-  });
+    // Step 2: Google redirect result ──────────────────────────
+    // FIX: Was plain `await handleRedirectResult()`.
+    // getRedirectResult(auth) can hang FOREVER on GitHub Pages
+    // when the authDomain isn't in Firebase's authorised list,
+    // or when the Firebase SDK is slow to initialise.
+    // Because boot() awaits it, hideLoadingScreen() was NEVER
+    // reached — causing the eternal "Initialising..." spinner.
+    //
+    // Fix: race handleRedirectResult() against a 3-second timer.
+    // If Firebase doesn't respond in 3s, we skip it and continue.
+    // The user can still sign in manually via the Sign In button.
+    await Promise.race([
+      handleRedirectResult(),
+      new Promise((resolve) => setTimeout(resolve, 3000)),
+    ]);
+    console.log('[NeonSpin] Step 3: Redirect result handled');
 
-  /* ── Step 4: Bind all UI events ──────────────────────────
-     Popup close, level-up close, sound/theme toggles,
-     feedback image preview, referral chip copy.           */
-  bindUIEvents();
+    // Step 3–9: All synchronous init — these cannot block ─────
+    initSpin({ onStateChange: (state) => syncUserStats(state) });
+    console.log('[NeonSpin] Step 4: Spin wheel initialised');
 
-  /* ── Step 5: Init mini games ─────────────────────────────
-     Tap Frenzy + 2048 — previously MISSING from the project */
-  initGames();
+    bindUIEvents();
+    initGames();
+    initTabNav();
+    initExtraButtons();
+    initTermsGate();
+    initAuthButtons();
+    console.log('[NeonSpin] Step 5: UI + games wired');
 
-  /* ── Step 6: Wire tab navigation ─────────────────────────
-     Bottom nav bar switches between Home/Games/Leaderboard/Rewards */
-  initTabNav();
+    // Step 10: Auth observer — non-blocking ───────────────────
+    // onAuthStateChanged fires asynchronously in the background.
+    // We do NOT await it — it calls onUserReady/onUserGone when
+    // Firebase responds, without blocking the boot sequence.
+    initAuthObserver(onUserReady, onUserGone);
+    console.log('[NeonSpin] Step 6: Auth observer registered');
 
-  /* ── Step 7: Wire extra buttons ──────────────────────────
-     Redeem button, feedback submit, leaderboard filters    */
-  initExtraButtons();
+    // Step 11: Feedback list ──────────────────────────────────
+    // FIX: DB rules require auth !== null, so this throws
+    // PERMISSION_DENIED for unauthenticated users.
+    // Wrapped in try/catch so it never bubbles up and kills boot.
+    try {
+      loadFeedbackList();
+    } catch (e) {
+      console.warn('[NeonSpin] Feedback list skipped (auth required):', e.message);
+    }
 
-  /* ── Step 8: Terms gate ──────────────────────────────────
-     Shows terms modal on first visit; handles accept button */
-  initTermsGate();
+    console.log('[NeonSpin] Step 7: App fully initialised');
 
-  /* ── Step 9: Auth buttons ──────────────────────────────── */
-  initAuthButtons();
-
-  /* ── Step 10: Auth observer ─────────────────────────────
-     onUserReady → merge Firebase profile into local state
-     onUserGone  → show auth modal
-     FIX: We hide the loading screen BEFORE the observer fires
-     because onAuthStateChanged can take 1-3s on slow networks.
-     The local state (from localStorage) is already displayed,
-     so the user sees a usable UI immediately.               */
-  initAuthObserver(onUserReady, onUserGone);
-
-  /* ── Step 11: Load initial data ─────────────────────────
-     Feedback list loads without requiring sign-in.        */
-  loadFeedbackList();
-
-  /* ── Step 12: Hide loading screen ───────────────────────
-     Local state is ready — show the app now.
-     Firebase will update values in the background.        */
- console.log("App fully initialized");
-   hideLoadingScreen();
+  } catch (err) {
+    // Any unexpected error during boot — log it but ALWAYS continue
+    console.error('[NeonSpin] Boot error (non-fatal):', err);
+  } finally {
+    // ── GUARANTEED HIDE ────────────────────────────────────
+    // finally runs whether boot() succeeded OR threw.
+    // The loading screen is ALWAYS hidden here.
+    clearTimeout(hardFallback); // Cancel the 5s hard fallback
+    hideLoadingScreen();
+    console.log('[NeonSpin] Step 8: Loading screen hidden');
+  }
 }
 
 
