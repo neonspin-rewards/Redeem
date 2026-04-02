@@ -72,7 +72,9 @@ async function boot() {
      Must be called FIRST on every page load.
      If the user just returned from Google sign-in,
      this picks up the auth result and hides the auth modal. */
-  await handleRedirectResult();
+  handleRedirectResult().catch((e) => {
+  console.error("Redirect error:", e);
+});
 
   /* ── Step 3: Initialise the spin wheel & game state ─────
      Pass a callback (onStateChange) so spin.js can sync
