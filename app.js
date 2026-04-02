@@ -25,7 +25,6 @@
 
 // ── Module imports (order matters) ──────────────────────────
 import {
-  handleRedirectResult,
   initTermsGate,
   initAuthButtons,
   initAuthObserver,
@@ -88,10 +87,7 @@ async function boot() {
     // Fix: race handleRedirectResult() against a 3-second timer.
     // If Firebase doesn't respond in 3s, we skip it and continue.
     // The user can still sign in manually via the Sign In button.
-    await Promise.race([
-      handleRedirectResult(),
-      new Promise((resolve) => setTimeout(resolve, 3000)),
-    ]);
+    
     console.log('[NeonSpin] Step 3: Redirect result handled');
 
     // Step 3–9: All synchronous init — these cannot block ─────
