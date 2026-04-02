@@ -22,10 +22,8 @@
 ═══════════════════════════════════════════════════════════════ */
 
 'use strict';
-
 import {
-  signInWithRedirect,
-  getRedirectResult,
+  signInWithPopup,
   signOut as fbSignOut,
   onAuthStateChanged,
 } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
@@ -196,7 +194,12 @@ async function handleGoogleSignIn() {
   showAuthLoading();
 
   try {
-    await signInWithRedirect(auth, provider);
+     const result = await signInWithPopup(auth, provider);
+
+if (result?.user) {
+  hideEl('auth-overlay');
+  document.getElementById('auth-loading')?.classList.add('hidden');
+}
     // ↑ Page navigates to Google here. Code below does NOT run.
   } catch (err) {
     console.error('[Auth] Redirect error:', err);
@@ -205,19 +208,6 @@ async function handleGoogleSignIn() {
 }
 
 /** Called on every page load to catch the Google redirect return. */
-export async function handleRedirectResult() {
-  try {
-    const result = await getRedirectResult(auth);
-    if (result?.user) {
-      hideEl('auth-overlay');
-      document.getElementById('auth-loading')?.classList.add('hidden');
-    }
-  } catch (err) {
-    console.error('[Auth] Redirect result error:', err);
-    showEl('auth-overlay');
-    showAuthError(friendlyError(err.code));
-  }
-}
 
 async function handleSignOut() {
   try {
