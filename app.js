@@ -127,7 +127,8 @@ async function boot() {
   /* ── Step 12: Hide loading screen ───────────────────────
      Local state is ready — show the app now.
      Firebase will update values in the background.        */
-  hideLoadingScreen();
+ console.log("App fully initialized");
+   hideLoadingScreen();
 }
 
 
