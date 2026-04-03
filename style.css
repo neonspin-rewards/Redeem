@@ -263,6 +263,7 @@ button { font-family: var(--font-body); cursor: pointer; border: none; backgroun
   position: absolute;
   border-radius: 50%;
   opacity: 0;
+  will-change: transform, opacity;
   animation: floatUp linear infinite;
 }
 
@@ -273,6 +274,9 @@ button { font-family: var(--font-body); cursor: pointer; border: none; backgroun
   100% { transform: translateY(-100%) scale(0.5); opacity: 0; }
 }
 
+.particle {
+  will-change: transform, opacity;  /* ADD THIS */
+}
 
 /* ─────────────────────────────────────────────────────────────
    7. MODALS (Terms, Auth, Popups, Level Up)
