@@ -332,8 +332,13 @@ function drawWheel(angle) {
   if (canvas.width !== physSize || canvas.height !== physSize) {
     canvas.width  = physSize;
     canvas.height = physSize;
-    canvas.style.width  = size + 'px';
-    canvas.style.height = size + 'px';
+    // NOTE: canvas.style.width/height intentionally NOT set here.
+    // Setting inline px styles on the canvas triggers a layout reflow.
+    // On mobile Chrome, a reflow can change the viewport height
+    // (address bar show/hide), which fires the resize event again,
+    // which calls drawWheel() again, which sets the style again → loop.
+    // The CSS rule `#spin-canvas { width:100%; height:100% }` correctly
+    // fills the .wheel-wrapper container — no inline style needed.
   }
 
   const ctx = canvas.getContext('2d');
