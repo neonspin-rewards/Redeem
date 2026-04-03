@@ -256,7 +256,13 @@ button { font-family: var(--font-body); cursor: pointer; border: none; backgroun
   overflow: hidden;
   /* Contain paint to prevent particles affecting page layout */
   contain: layout paint;
-  will-change: transform;
+  /* NOTE: will-change: transform intentionally removed.
+     Having will-change on a full-screen fixed element forces it into
+     its own compositor layer. On mobile Chrome, this causes the browser
+     to re-composite ALL overlapping layers (header z:200, nav z:200)
+     every time any particle animation updates — which happens every ~1s.
+     This re-compositing made the header and nav visually jump off screen.
+     The particles themselves keep their own will-change (correct). */
 }
 
 .particle {
