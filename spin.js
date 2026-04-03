@@ -312,11 +312,12 @@ function getWheelSize() {
   return _cachedWheelSize;
 }
 
-// Invalidate size cache on resize so wheel redraws at new size
-window.addEventListener('resize', () => {
-  _cachedWheelSize = 0;
-  drawWheel(currentAngle); // Redraw at new size
-}, { passive: true });
+// NOTE: window resize listener intentionally removed.
+// The resize listener called drawWheel() which called getBoundingClientRect()
+// (forced layout flush) and set canvas.style.width/height (DOM reflow).
+// On mobile Chrome this triggered a resize → reflow → resize loop.
+// The CSS already controls canvas display size via .wheel-wrapper { width: min(300px,88vw) }
+// so no JS resize handling is needed.
 
 function drawWheel(angle) {
   const canvas = document.getElementById('spin-canvas');
@@ -332,13 +333,9 @@ function drawWheel(angle) {
   if (canvas.width !== physSize || canvas.height !== physSize) {
     canvas.width  = physSize;
     canvas.height = physSize;
-    // NOTE: canvas.style.width/height intentionally NOT set here.
-    // Setting inline px styles on the canvas triggers a layout reflow.
-    // On mobile Chrome, a reflow can change the viewport height
-    // (address bar show/hide), which fires the resize event again,
-    // which calls drawWheel() again, which sets the style again → loop.
-    // The CSS rule `#spin-canvas { width:100%; height:100% }` correctly
-    // fills the .wheel-wrapper container — no inline style needed.
+    // NOTE: canvas.style.width/height removed — setting inline px styles
+    // triggers layout reflow → resize event on mobile → loop.
+    // CSS (width:100%; height:100%) already controls display size correctly.
   }
 
   const ctx = canvas.getContext('2d');
@@ -1115,3 +1112,4 @@ function playSound(type) {
 
 /* Expose so auth.js tab navigation can play click sounds */
 window.__ns_playSound = playSound;
+p
