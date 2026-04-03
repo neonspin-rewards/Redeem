@@ -255,7 +255,7 @@ button { font-family: var(--font-body); cursor: pointer; border: none; backgroun
   pointer-events: none;
   overflow: hidden;
   /* Contain paint to prevent particles affecting page layout */
-  contain: strict;
+  contain: layout paint;
 }
 
 .particle {
