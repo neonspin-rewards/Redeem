@@ -27,9 +27,7 @@
       --font-b:  'Rajdhani', sans-serif;
       --r:       12px;
     }
-
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
     body {
       font-family: var(--font-b);
       background: var(--bg);
@@ -38,7 +36,6 @@
       font-size: 14px;
       -webkit-font-smoothing: antialiased;
     }
-
     a { color: var(--accent); text-decoration: none; }
     button { font-family: var(--font-b); cursor: pointer; border: none; }
     input, select, textarea { font-family: var(--font-b); }
@@ -51,7 +48,6 @@
       justify-content: center;
       background: radial-gradient(ellipse at 50% 0%, rgba(0,212,255,.06) 0%, transparent 60%);
     }
-
     .login-box {
       background: var(--card);
       border: 1px solid var(--border);
@@ -61,7 +57,6 @@
       text-align: center;
       box-shadow: 0 24px 80px rgba(0,0,0,.5);
     }
-
     .login-logo {
       font-family: var(--font-d);
       font-size: 24px;
@@ -72,15 +67,7 @@
       background-clip: text;
       margin-bottom: 6px;
     }
-
-    .login-sub {
-      color: var(--muted);
-      font-size: 12px;
-      margin-bottom: 28px;
-      letter-spacing: .04em;
-      text-transform: uppercase;
-    }
-
+    .login-sub { color: var(--muted); font-size: 12px; margin-bottom: 28px; letter-spacing: .04em; text-transform: uppercase; }
     .admin-badge {
       display: inline-block;
       background: rgba(255,123,53,.12);
@@ -94,7 +81,6 @@
       padding: 4px 12px;
       margin-bottom: 20px;
     }
-
     .btn-google-admin {
       display: flex;
       align-items: center;
@@ -110,19 +96,11 @@
       border: 1px solid #dadce0;
       transition: box-shadow .2s;
     }
-
     .btn-google-admin:hover { box-shadow: 0 4px 16px rgba(0,0,0,.15); }
-
-    #login-error {
-      margin-top: 12px;
-      color: var(--red);
-      font-size: 13px;
-      display: none;
-    }
+    #login-error { margin-top: 12px; color: var(--red); font-size: 13px; display: none; }
 
     /* ── Dashboard Layout ── */
     #dashboard { display: none; }
-
     .dash-header {
       background: rgba(8,11,20,.92);
       backdrop-filter: blur(16px);
@@ -136,7 +114,6 @@
       top: 0;
       z-index: 100;
     }
-
     .dash-logo {
       font-family: var(--font-d);
       font-size: 16px;
@@ -146,15 +123,18 @@
       -webkit-text-fill-color: transparent;
       background-clip: text;
     }
-
-    .dash-user {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-size: 13px;
-      color: var(--muted);
+    .dash-header-right { display: flex; align-items: center; gap: 10px; }
+    .dash-role-badge {
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .06em;
+      text-transform: uppercase;
     }
-
+    .role-admin       { background: rgba(0,212,255,.12);  color: var(--accent); border: 1px solid rgba(0,212,255,.25); }
+    .role-super_admin { background: rgba(251,191,36,.12); color: var(--gold);   border: 1px solid rgba(251,191,36,.3); }
+    .dash-user { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--muted); }
     .btn-logout {
       padding: 6px 14px;
       border-radius: 20px;
@@ -165,54 +145,63 @@
       font-weight: 600;
       transition: background .2s;
     }
-
     .btn-logout:hover { background: rgba(255,68,68,.18); }
-
-    .dash-body {
-      max-width: 1100px;
-      margin: 0 auto;
-      padding: 24px 20px;
-    }
+    .dash-body { max-width: 1200px; margin: 0 auto; padding: 24px 20px; }
 
     /* ── Stat Cards ── */
     .stat-row {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
       gap: 14px;
-      margin-bottom: 28px;
+      margin-bottom: 24px;
     }
+    .stat-box { background: var(--card); border: 1px solid var(--border); border-radius: var(--r); padding: 18px 16px; }
+    .stat-box-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 6px; }
+    .stat-box-value { font-family: var(--font-d); font-size: 26px; font-weight: 700; color: var(--accent); }
 
-    .stat-box {
+    /* ── Tab Navigation ── */
+    .tab-nav {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 20px;
       background: var(--card);
       border: 1px solid var(--border);
       border-radius: var(--r);
-      padding: 18px 16px;
+      padding: 6px;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
     }
-
-    .stat-box-label {
-      font-size: 11px;
+    .tab-nav::-webkit-scrollbar { display: none; }
+    .tab-btn {
+      flex-shrink: 0;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
       color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: .06em;
-      margin-bottom: 6px;
+      background: transparent;
+      border: 1px solid transparent;
+      transition: all .2s;
+      white-space: nowrap;
+      position: relative;
     }
-
-    .stat-box-value {
-      font-family: var(--font-d);
-      font-size: 26px;
-      font-weight: 700;
-      color: var(--accent);
+    .tab-btn:hover { color: var(--text); background: rgba(255,255,255,.04); }
+    .tab-btn.active { background: rgba(0,212,255,.1); border-color: rgba(0,212,255,.25); color: var(--accent); }
+    .tab-btn .badge-dot {
+      position: absolute;
+      top: 4px; right: 4px;
+      width: 7px; height: 7px;
+      background: var(--red);
+      border-radius: 50%;
+      display: none;
     }
+    .tab-btn .badge-dot.show { display: block; }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
 
     /* ── Sections ── */
-    .section {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: var(--r);
-      margin-bottom: 20px;
-      overflow: hidden;
-    }
-
+    .section { background: var(--card); border: 1px solid var(--border); border-radius: var(--r); margin-bottom: 20px; overflow: hidden; }
     .section-head {
       padding: 14px 18px;
       border-bottom: 1px solid var(--border);
@@ -220,31 +209,14 @@
       align-items: center;
       justify-content: space-between;
       gap: 12px;
+      flex-wrap: wrap;
     }
-
-    .section-title {
-      font-family: var(--font-d);
-      font-size: 13px;
-      font-weight: 700;
-      color: var(--text);
-    }
-
-    .section-body {
-      padding: 16px 18px;
-    }
+    .section-title { font-family: var(--font-d); font-size: 13px; font-weight: 700; color: var(--text); }
+    .section-body { padding: 16px 18px; }
 
     /* ── Table ── */
-    .table-wrap {
-      overflow-x: auto;
-      -webkit-overflow-scrolling: touch;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 13px;
-    }
-
+    .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
     th {
       text-align: left;
       padding: 8px 12px;
@@ -255,46 +227,35 @@
       border-bottom: 1px solid var(--border);
       white-space: nowrap;
     }
-
-    td {
-      padding: 10px 12px;
-      border-bottom: 1px solid rgba(255,255,255,.04);
-      vertical-align: middle;
-    }
-
+    td { padding: 10px 12px; border-bottom: 1px solid rgba(255,255,255,.04); vertical-align: middle; }
     tr:last-child td { border-bottom: none; }
     tr:hover td { background: rgba(255,255,255,.02); }
 
     /* ── Badges ── */
-    .badge {
-      display: inline-block;
-      padding: 2px 8px;
-      border-radius: 20px;
-      font-size: 11px;
-      font-weight: 700;
-    }
-
-    .badge-pending  { background: rgba(251,191,36,.12); color: var(--gold); border: 1px solid rgba(251,191,36,.25); }
-    .badge-approved { background: rgba(57,255,20,.1);   color: var(--green); border: 1px solid rgba(57,255,20,.2); }
-    .badge-rejected { background: rgba(255,68,68,.1);   color: var(--red);   border: 1px solid rgba(255,68,68,.2); }
+    .badge { display: inline-block; padding: 2px 8px; border-radius: 20px; font-size: 11px; font-weight: 700; }
+    .badge-pending  { background: rgba(251,191,36,.12); color: var(--gold);   border: 1px solid rgba(251,191,36,.25); }
+    .badge-approved { background: rgba(57,255,20,.1);   color: var(--green);  border: 1px solid rgba(57,255,20,.2); }
+    .badge-rejected { background: rgba(255,68,68,.1);   color: var(--red);    border: 1px solid rgba(255,68,68,.2); }
+    .badge-paid     { background: rgba(0,212,255,.1);   color: var(--accent); border: 1px solid rgba(0,212,255,.2); }
+    .badge-banned   { background: rgba(255,68,68,.12);  color: var(--red);    border: 1px solid rgba(255,68,68,.25); }
+    .badge-active   { background: rgba(57,255,20,.08);  color: var(--green);  border: 1px solid rgba(57,255,20,.15); }
+    .badge-user     { background: rgba(127,142,163,.1); color: var(--muted);  border: 1px solid rgba(127,142,163,.2); }
+    .badge-admin    { background: rgba(0,212,255,.1);   color: var(--accent); border: 1px solid rgba(0,212,255,.2); }
+    .badge-super    { background: rgba(251,191,36,.12); color: var(--gold);   border: 1px solid rgba(251,191,36,.25); }
 
     /* ── Buttons ── */
-    .btn {
-      padding: 6px 14px;
-      border-radius: 8px;
-      font-size: 12px;
-      font-weight: 600;
-      transition: opacity .15s;
-      cursor: pointer;
-    }
-
+    .btn { padding: 6px 14px; border-radius: 8px; font-size: 12px; font-weight: 600; transition: opacity .15s; cursor: pointer; }
     .btn:hover { opacity: .8; }
+    .btn:disabled { opacity: .4 !important; cursor: not-allowed; }
     .btn-green  { background: rgba(57,255,20,.15);  color: var(--green);  border: 1px solid rgba(57,255,20,.25); }
     .btn-red    { background: rgba(255,68,68,.12);  color: var(--red);    border: 1px solid rgba(255,68,68,.2); }
     .btn-blue   { background: rgba(0,212,255,.1);   color: var(--accent); border: 1px solid rgba(0,212,255,.2); }
     .btn-orange { background: rgba(255,123,53,.1);  color: var(--orange); border: 1px solid rgba(255,123,53,.2); }
+    .btn-gold   { background: rgba(251,191,36,.1);  color: var(--gold);   border: 1px solid rgba(251,191,36,.2); }
+    .btn-purple { background: rgba(168,85,247,.1);  color: var(--accent2);border: 1px solid rgba(168,85,247,.2); }
+    .btn-group { display: flex; gap: 4px; flex-wrap: wrap; }
 
-    /* ── Search / controls ── */
+    /* ── Inputs ── */
     .input-sm {
       background: rgba(255,255,255,.04);
       border: 1px solid rgba(255,255,255,.1);
@@ -306,11 +267,11 @@
       outline: none;
       transition: border-color .2s;
     }
-
     .input-sm:focus { border-color: var(--accent); }
+    select.input-sm option { background: var(--card); }
 
-    /* ── Edit user modal ── */
-    #edit-modal {
+    /* ── Modals ── */
+    .modal-overlay {
       position: fixed;
       inset: 0;
       z-index: 500;
@@ -321,35 +282,68 @@
       justify-content: center;
       padding: 20px;
     }
-
-    #edit-modal.open { display: flex; }
-
-    .edit-box {
+    .modal-overlay.open { display: flex; }
+    .modal-box {
       background: var(--card);
       border: 1px solid var(--border);
       border-radius: 16px;
       padding: 24px;
       width: 100%;
-      max-width: 380px;
+      max-width: 440px;
+      max-height: 90vh;
+      overflow-y: auto;
     }
-
-    .edit-title {
+    .modal-title {
       font-family: var(--font-d);
       font-size: 15px;
       color: var(--accent);
       margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
     }
-
-    .edit-field {
-      margin-bottom: 12px;
+    .modal-close {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.1);
+      color: var(--muted);
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
     }
-
+    .modal-close:hover { color: var(--text); background: rgba(255,255,255,.1); }
+    .edit-field { margin-bottom: 14px; }
     .edit-field label {
       display: block;
-      font-size: 12px;
+      font-size: 11px;
       color: var(--muted);
-      margin-bottom: 4px;
+      margin-bottom: 5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .04em;
     }
+    .field-row { display: flex; gap: 8px; align-items: center; }
+    .field-row .input-sm { flex: 1; }
+    .divider { height: 1px; background: var(--border); margin: 16px 0; }
+    .danger-zone {
+      background: rgba(255,68,68,.05);
+      border: 1px solid rgba(255,68,68,.15);
+      border-radius: 10px;
+      padding: 14px;
+      margin-top: 12px;
+    }
+    .danger-zone-title { font-size: 11px; color: var(--red); font-weight: 700; letter-spacing: .08em; text-transform: uppercase; margin-bottom: 10px; }
+    .super-admin-zone {
+      background: rgba(251,191,36,.04);
+      border: 1px solid rgba(251,191,36,.15);
+      border-radius: 10px;
+      padding: 14px;
+      margin-top: 12px;
+    }
+    .super-admin-zone-title { font-size: 11px; color: var(--gold); font-weight: 700; letter-spacing: .08em; text-transform: uppercase; margin-bottom: 10px; }
 
     /* ── Toast ── */
     #toast {
@@ -370,42 +364,65 @@
       white-space: nowrap;
       box-shadow: 0 8px 32px rgba(0,0,0,.4);
     }
-
     #toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
 
-    /* ── Broadcast textarea ── */
-    .broadcast-form {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
+    /* ── Broadcast ── */
+    .broadcast-form { display: flex; flex-direction: column; gap: 10px; }
 
     /* ── Pagination ── */
-    .pagination {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-top: 12px;
-    }
+    .pagination { display: flex; align-items: center; gap: 8px; margin-top: 12px; }
 
     /* ── Empty state ── */
-    .empty-row td {
-      text-align: center;
-      padding: 28px;
-      color: var(--muted);
-    }
+    .empty-row td { text-align: center; padding: 28px; color: var(--muted); }
 
     /* ── Feedback images ── */
-    .fb-img {
-      max-width: 80px;
-      max-height: 60px;
-      border-radius: 6px;
-      object-fit: cover;
+    .fb-img { max-width: 80px; max-height: 60px; border-radius: 6px; object-fit: cover; }
+
+    /* ── Log action pill ── */
+    .log-action {
+      font-family: var(--font-d);
+      font-size: 10px;
+      padding: 2px 6px;
+      border-radius: 4px;
+      background: rgba(0,212,255,.08);
+      color: var(--accent);
+      border: 1px solid rgba(0,212,255,.15);
+      white-space: nowrap;
     }
+
+    /* ── Settings ── */
+    .settings-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
+    .setting-card { background: rgba(255,255,255,.03); border: 1px solid var(--border); border-radius: 10px; padding: 16px; }
+    .setting-card-label { font-size: 12px; color: var(--muted); font-weight: 700; text-transform: uppercase; letter-spacing: .06em; margin-bottom: 4px; }
+    .setting-card-desc { font-size: 12px; color: var(--muted); margin-bottom: 10px; }
+
+    /* ── Super Admin ── */
+    .super-admin-banner {
+      background: linear-gradient(135deg, rgba(251,191,36,.08), rgba(251,191,36,.03));
+      border: 1px solid rgba(251,191,36,.2);
+      border-radius: 10px;
+      padding: 12px 16px;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 13px;
+      color: var(--gold);
+    }
+
+    /* ── Role-hidden ── */
+    .super-admin-only { display: none; }
+
+    /* ── Flag reason ── */
+    .flag-reason { font-size: 12px; color: var(--orange); max-width: 200px; word-break: break-word; }
+
+    /* ── UPI monospace ── */
+    .upi-text { font-family: monospace; background: rgba(255,255,255,.05); padding: 2px 6px; border-radius: 4px; font-size: 12px; }
 
     @media (max-width: 600px) {
       .dash-body { padding: 14px 12px; }
       .stat-row { grid-template-columns: repeat(2, 1fr); }
+      .tab-btn { padding: 7px 10px; font-size: 11px; }
     }
   </style>
 </head>
@@ -417,7 +434,6 @@
       <div class="login-logo">⚡ NeonSpin</div>
       <div class="login-sub">Admin Dashboard</div>
       <div class="admin-badge">🔒 Restricted Access</div>
-
       <button id="btn-admin-login" class="btn-google-admin">
         <svg width="20" height="20" viewBox="0 0 18 18">
           <path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z"/>
@@ -427,19 +443,20 @@
         </svg>
         Sign in with Google
       </button>
-
       <div id="login-error"></div>
     </div>
   </div>
 
   <!-- ─── Dashboard ─────────────────────────────── -->
   <div id="dashboard">
-
     <header class="dash-header">
       <div class="dash-logo">⚡ Admin Panel</div>
-      <div class="dash-user">
-        <span id="admin-name"></span>
-        <button id="btn-admin-logout" class="btn-logout">Sign Out</button>
+      <div class="dash-header-right">
+        <span id="admin-role-badge" class="dash-role-badge role-admin">Admin</span>
+        <div class="dash-user">
+          <span id="admin-name"></span>
+          <button id="btn-admin-logout" class="btn-logout">Sign Out</button>
+        </div>
       </div>
     </header>
 
@@ -456,6 +473,10 @@
           <div class="stat-box-value" id="stat-pending">—</div>
         </div>
         <div class="stat-box">
+          <div class="stat-box-label">Flagged Users</div>
+          <div class="stat-box-value" id="stat-flagged" style="color:var(--orange)">—</div>
+        </div>
+        <div class="stat-box">
           <div class="stat-box-label">Feedback Items</div>
           <div class="stat-box-value" id="stat-feedback">—</div>
         </div>
@@ -463,154 +484,440 @@
           <div class="stat-box-label">Highest Level</div>
           <div class="stat-box-value" id="stat-max-level">—</div>
         </div>
-      </div>
-
-      <!-- Users Table -->
-      <div class="section">
-        <div class="section-head">
-          <div class="section-title">👥 Users</div>
-          <div style="display:flex;gap:8px;flex-wrap:wrap">
-            <input type="text" id="user-search" class="input-sm" placeholder="Search by name…" />
-            <button class="btn btn-blue" id="btn-export">⬇ Export JSON</button>
-          </div>
-        </div>
-        <div class="section-body">
-          <div class="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>Name</th>
-                  <th>Email</th>
-                  <th>Level</th>
-                  <th>Coins</th>
-                  <th>EXP</th>
-                  <th>Streak</th>
-                  <th>Joined</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody id="users-tbody">
-                <tr class="empty-row"><td colspan="8">Loading users…</td></tr>
-              </tbody>
-            </table>
-          </div>
-          <div class="pagination">
-            <button class="btn btn-blue" id="btn-prev-page">◀ Prev</button>
-            <span id="page-info" style="color:var(--muted);font-size:12px"></span>
-            <button class="btn btn-blue" id="btn-next-page">Next ▶</button>
-          </div>
+        <div class="stat-box">
+          <div class="stat-box-label">Banned Users</div>
+          <div class="stat-box-value" id="stat-banned" style="color:var(--red)">—</div>
         </div>
       </div>
 
-      <!-- Reward Requests -->
-      <div class="section">
-        <div class="section-head">
-          <div class="section-title">🎁 Reward Requests</div>
-          <span class="badge badge-pending" id="pending-count-badge">0 pending</span>
-        </div>
-        <div class="section-body">
-          <div class="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>Name</th>
-                  <th>Email</th>
-                  <th>Level</th>
-                  <th>Coins</th>
-                  <th>Streak</th>
-                  <th>Status</th>
-                  <th>Date</th>
-                  <th>Action</th>
-                </tr>
-              </thead>
-              <tbody id="requests-tbody">
-                <tr class="empty-row"><td colspan="8">Loading…</td></tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
+      <!-- Tab Navigation -->
+      <div class="tab-nav">
+        <button class="tab-btn active" data-tab="users">👥 Users</button>
+        <button class="tab-btn" data-tab="redeem">
+          🎁 Redeem<span class="badge-dot" id="dot-redeem"></span>
+        </button>
+        <button class="tab-btn" data-tab="feedback">💬 Feedback</button>
+        <button class="tab-btn" data-tab="flagged">
+          🚨 Flagged<span class="badge-dot" id="dot-flagged"></span>
+        </button>
+        <button class="tab-btn" data-tab="logs">📋 Logs</button>
+        <button class="tab-btn" data-tab="broadcast">📢 Broadcast</button>
+        <button class="tab-btn super-admin-only" data-tab="settings">⚙️ Settings</button>
       </div>
 
-      <!-- Feedback -->
-      <div class="section">
-        <div class="section-head">
-          <div class="section-title">💬 Community Feedback</div>
+      <!-- ══ TAB: USERS ══ -->
+      <div class="tab-panel active" id="tab-users">
+        <div class="section">
+          <div class="section-head">
+            <div class="section-title">👥 All Users</div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              <input type="text" id="user-search" class="input-sm" placeholder="Search name or email…" style="width:200px" />
+              <select id="user-filter-role" class="input-sm">
+                <option value="">All Roles</option>
+                <option value="user">Users</option>
+                <option value="admin">Admins</option>
+                <option value="super_admin">Super Admin</option>
+              </select>
+              <select id="user-filter-ban" class="input-sm">
+                <option value="">All Status</option>
+                <option value="active">Active</option>
+                <option value="banned">Banned</option>
+              </select>
+              <button class="btn btn-blue" id="btn-export">⬇ Export JSON</button>
+            </div>
+          </div>
+          <div class="section-body">
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Name</th><th>Email</th><th>Role</th><th>Level</th>
+                    <th>Coins</th><th>EXP</th><th>Streak</th>
+                    <th>Status</th><th>Joined</th><th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="users-tbody">
+                  <tr class="empty-row"><td colspan="10">Loading users…</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="pagination">
+              <button class="btn btn-blue" id="btn-prev-page">◀ Prev</button>
+              <span id="page-info" style="color:var(--muted);font-size:12px"></span>
+              <button class="btn btn-blue" id="btn-next-page">Next ▶</button>
+            </div>
+          </div>
         </div>
-        <div class="section-body">
-          <div class="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>Name</th>
-                  <th>Message</th>
-                  <th>Image</th>
-                  <th>Date</th>
-                  <th>Action</th>
-                </tr>
-              </thead>
-              <tbody id="feedback-tbody">
-                <tr class="empty-row"><td colspan="5">Loading…</td></tr>
-              </tbody>
-            </table>
+        <div class="section">
+          <div class="section-head">
+            <div class="section-title">💎 Send Redeem to User</div>
+          </div>
+          <div class="section-body" style="display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end">
+            <div>
+              <label style="font-size:12px;color:var(--muted);display:block;margin-bottom:4px">User UID or Email</label>
+              <input type="text" id="redeem-uid" class="input-sm" placeholder="UID or email…" style="width:260px" />
+            </div>
+            <div>
+              <label style="font-size:12px;color:var(--muted);display:block;margin-bottom:4px">Redeem Code / Note</label>
+              <input type="text" id="redeem-note" class="input-sm" placeholder="e.g. PROMO-XYZ" style="width:220px" />
+            </div>
+            <button class="btn btn-green" id="btn-send-redeem">✅ Send Redeem</button>
           </div>
         </div>
       </div>
 
-      <!-- Broadcast -->
-      <div class="section">
-        <div class="section-head">
-          <div class="section-title">📢 Broadcast Message</div>
-        </div>
-        <div class="section-body">
-          <div class="broadcast-form">
-            <input type="text" id="bc-title" class="input-sm" placeholder="Broadcast title…" />
-            <textarea id="bc-msg" class="input-sm" rows="3" placeholder="Message to all users…" style="resize:vertical"></textarea>
-            <button class="btn btn-orange" id="btn-broadcast" style="align-self:flex-start">📣 Send Broadcast</button>
+      <!-- ══ TAB: REDEEM ══ -->
+      <div class="tab-panel" id="tab-redeem">
+        <div class="section">
+          <div class="section-head">
+            <div class="section-title">🎁 Withdrawal / Redeem Requests</div>
+            <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+              <select id="redeem-status-filter" class="input-sm">
+                <option value="">All Requests</option>
+                <option value="pending">Pending</option>
+                <option value="approved">Approved</option>
+                <option value="rejected">Rejected</option>
+                <option value="paid">Paid</option>
+              </select>
+              <span class="badge badge-pending" id="pending-count-badge">0 pending</span>
+            </div>
+          </div>
+          <div class="section-body">
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Name</th><th>Email</th><th>UPI</th><th>Coins</th>
+                    <th>₹ Value</th><th>Level</th><th>Status</th><th>Date</th><th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="requests-tbody">
+                  <tr class="empty-row"><td colspan="9">Loading…</td></tr>
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- Send Redeem to User -->
-      <div class="section">
-        <div class="section-head">
-          <div class="section-title">💎 Send Redeem to User</div>
+      <!-- ══ TAB: FEEDBACK ══ -->
+      <div class="tab-panel" id="tab-feedback">
+        <div class="section">
+          <div class="section-head">
+            <div class="section-title">💬 Community Feedback</div>
+          </div>
+          <div class="section-body">
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr><th>Name</th><th>Message</th><th>Image</th><th>Date</th><th>Action</th></tr>
+                </thead>
+                <tbody id="feedback-tbody">
+                  <tr class="empty-row"><td colspan="5">Loading…</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
         </div>
-        <div class="section-body" style="display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end">
-          <div>
-            <label style="font-size:12px;color:var(--muted);display:block;margin-bottom:4px">User UID or Email</label>
-            <input type="text" id="redeem-uid" class="input-sm" placeholder="UID or email…" style="width:260px" />
+      </div>
+
+      <!-- ══ TAB: FLAGGED USERS ══ -->
+      <div class="tab-panel" id="tab-flagged">
+        <div class="section">
+          <div class="section-head">
+            <div class="section-title">🚨 Flagged Users — Anti-Cheat</div>
+            <span style="font-size:12px;color:var(--muted)">Suspicious activity auto-detected</span>
           </div>
-          <div>
-            <label style="font-size:12px;color:var(--muted);display:block;margin-bottom:4px">Redeem Code / Note</label>
-            <input type="text" id="redeem-note" class="input-sm" placeholder="e.g. PROMO-XYZ or reward note" style="width:220px" />
+          <div class="section-body">
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>User</th><th>Reason</th><th>Coins Before</th>
+                    <th>Coins After</th><th>EXP Before</th><th>EXP After</th>
+                    <th>Flagged At</th><th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="flagged-tbody">
+                  <tr class="empty-row"><td colspan="8">Loading flagged users…</td></tr>
+                </tbody>
+              </table>
+            </div>
           </div>
-          <button class="btn btn-green" id="btn-send-redeem">✅ Send Redeem</button>
+        </div>
+      </div>
+
+      <!-- ══ TAB: ADMIN LOGS ══ -->
+      <div class="tab-panel" id="tab-logs">
+        <div class="section">
+          <div class="section-head">
+            <div class="section-title">📋 Admin Audit Logs</div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              <select id="log-action-filter" class="input-sm">
+                <option value="">All Actions</option>
+                <option value="BAN_USER">BAN_USER</option>
+                <option value="UNBAN_USER">UNBAN_USER</option>
+                <option value="ADD_COINS">ADD_COINS</option>
+                <option value="REMOVE_COINS">REMOVE_COINS</option>
+                <option value="UPDATE_EXP">UPDATE_EXP</option>
+                <option value="CHANGE_LEVEL">CHANGE_LEVEL</option>
+                <option value="APPROVE_REDEEM">APPROVE_REDEEM</option>
+                <option value="REJECT_REDEEM">REJECT_REDEEM</option>
+                <option value="MARK_PAID">MARK_PAID</option>
+                <option value="PROMOTE_ADMIN">PROMOTE_ADMIN</option>
+                <option value="DEMOTE_ADMIN">DEMOTE_ADMIN</option>
+                <option value="DELETE_FEEDBACK">DELETE_FEEDBACK</option>
+                <option value="IGNORE_FLAG">IGNORE_FLAG</option>
+              </select>
+              <button class="btn btn-blue" id="btn-refresh-logs">🔄 Refresh</button>
+            </div>
+          </div>
+          <div class="section-body">
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr><th>#</th><th>Admin</th><th>Action</th><th>Target</th><th>Details</th><th>Timestamp</th></tr>
+                </thead>
+                <tbody id="logs-tbody">
+                  <tr class="empty-row"><td colspan="6">Loading logs…</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="pagination">
+              <button class="btn btn-blue" id="btn-prev-logs">◀ Prev</button>
+              <span id="logs-page-info" style="color:var(--muted);font-size:12px"></span>
+              <button class="btn btn-blue" id="btn-next-logs">Next ▶</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ TAB: BROADCAST ══ -->
+      <div class="tab-panel" id="tab-broadcast">
+        <div class="section">
+          <div class="section-head">
+            <div class="section-title">📢 Broadcast Message to All Users</div>
+          </div>
+          <div class="section-body">
+            <div class="broadcast-form">
+              <input type="text" id="bc-title" class="input-sm" placeholder="Broadcast title…" />
+              <textarea id="bc-msg" class="input-sm" rows="4" placeholder="Message to all users…" style="resize:vertical"></textarea>
+              <button class="btn btn-orange" id="btn-broadcast" style="align-self:flex-start">📣 Send Broadcast</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ TAB: SETTINGS (super_admin only) ══ -->
+      <div class="tab-panel super-admin-only" id="tab-settings">
+        <div class="super-admin-banner">
+          👑 <strong>Super Admin Zone</strong> — Only you can view and edit this panel.
+        </div>
+        <div class="section">
+          <div class="section-head">
+            <div class="section-title">⚙️ System Settings</div>
+            <button class="btn btn-gold" id="btn-save-settings">💾 Save All Settings</button>
+          </div>
+          <div class="section-body">
+            <div class="settings-grid">
+              <div class="setting-card">
+                <div class="setting-card-label">Coin Conversion Rate</div>
+                <div class="setting-card-desc">Coins needed to earn ₹1</div>
+                <input type="number" id="setting-coinRate" class="input-sm" style="width:100%" min="1" value="1000" />
+              </div>
+              <div class="setting-card">
+                <div class="setting-card-label">Ad Reward Coins</div>
+                <div class="setting-card-desc">Coins earned per ad watched</div>
+                <input type="number" id="setting-adReward" class="input-sm" style="width:100%" min="1" value="5" />
+              </div>
+              <div class="setting-card">
+                <div class="setting-card-label">Daily Ad Limit</div>
+                <div class="setting-card-desc">Max ads per user per day</div>
+                <input type="number" id="setting-dailyAdLimit" class="input-sm" style="width:100%" min="1" value="20" />
+              </div>
+              <div class="setting-card">
+                <div class="setting-card-label">Min Redeem Level</div>
+                <div class="setting-card-desc">Level required to request reward</div>
+                <input type="number" id="setting-minRedeemLevel" class="input-sm" style="width:100%" min="1" value="12" />
+              </div>
+              <div class="setting-card">
+                <div class="setting-card-label">Min Redeem Streak</div>
+                <div class="setting-card-desc">Login streak days required</div>
+                <input type="number" id="setting-minStreak" class="input-sm" style="width:100%" min="0" value="7" />
+              </div>
+              <div class="setting-card">
+                <div class="setting-card-label">Anti-Cheat Coin Threshold</div>
+                <div class="setting-card-desc">Flag if coins jump by this amount</div>
+                <input type="number" id="setting-flagCoinThreshold" class="input-sm" style="width:100%" min="100" value="500" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Role Management -->
+        <div class="section">
+          <div class="section-head">
+            <div class="section-title">👑 Role Management</div>
+            <span style="font-size:12px;color:var(--muted)">Promote users to admin or demote admins</span>
+          </div>
+          <div class="section-body">
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr><th>Name</th><th>Email</th><th>Current Role</th><th>Actions</th></tr>
+                </thead>
+                <tbody id="roles-tbody">
+                  <tr class="empty-row"><td colspan="4">Loading…</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Firebase Rules -->
+        <div class="section">
+          <div class="section-head">
+            <div class="section-title">🔐 Recommended Firebase Security Rules</div>
+          </div>
+          <div class="section-body">
+            <p style="color:var(--muted);font-size:13px;margin-bottom:12px">
+              Copy these to Firebase Console → Realtime Database → Rules tab.
+            </p>
+            <pre id="firebase-rules-display" style="background:rgba(0,0,0,.4);border:1px solid var(--border);border-radius:8px;padding:14px;font-size:11px;overflow-x:auto;color:var(--text);line-height:1.6;white-space:pre-wrap">{
+  "rules": {
+    "users": {
+      ".read": "auth != null && (root.child('users').child(auth.uid).child('role').val() === 'admin' || root.child('users').child(auth.uid).child('role').val() === 'super_admin')",
+      "$uid": {
+        ".read": "$uid === auth.uid",
+        ".write": "$uid === auth.uid"
+      }
+    },
+    "adminLogs": {
+      ".read": "auth != null && (root.child('users').child(auth.uid).child('role').val() === 'admin' || root.child('users').child(auth.uid).child('role').val() === 'super_admin')",
+      ".write": "auth != null && (root.child('users').child(auth.uid).child('role').val() === 'admin' || root.child('users').child(auth.uid).child('role').val() === 'super_admin')"
+    },
+    "flaggedUsers": {
+      ".read": "auth != null && (root.child('users').child(auth.uid).child('role').val() === 'admin' || root.child('users').child(auth.uid).child('role').val() === 'super_admin')",
+      ".write": "auth != null"
+    },
+    "settings": {
+      ".read": "auth != null",
+      ".write": "auth != null && root.child('users').child(auth.uid).child('role').val() === 'super_admin'"
+    },
+    "rewardRequests": {
+      ".read": "auth != null && (root.child('users').child(auth.uid).child('role').val() === 'admin' || root.child('users').child(auth.uid).child('role').val() === 'super_admin')",
+      ".write": "auth != null"
+    },
+    "broadcasts": {
+      ".read": "auth != null",
+      ".write": "auth != null && (root.child('users').child(auth.uid).child('role').val() === 'admin' || root.child('users').child(auth.uid).child('role').val() === 'super_admin')"
+    },
+    "feedback": {
+      ".read": "auth != null",
+      ".write": "auth != null"
+    }
+  }
+}</pre>
+            <button class="btn btn-blue" style="margin-top:12px" id="btn-copy-rules">📋 Copy Rules</button>
+          </div>
         </div>
       </div>
 
     </div><!-- /dash-body -->
   </div><!-- /dashboard -->
 
-  <!-- Edit user modal -->
-  <div id="edit-modal">
-    <div class="edit-box">
-      <div class="edit-title">✏️ Edit User</div>
+  <!-- ─── Edit User Modal ─────────────────────── -->
+  <div id="edit-modal" class="modal-overlay">
+    <div class="modal-box">
+      <div class="modal-title">
+        <span>✏️ Edit User</span>
+        <span class="modal-close" id="btn-edit-cancel-x">✕</span>
+      </div>
       <input type="hidden" id="edit-uid" />
+      <input type="hidden" id="edit-current-role" />
+      <div id="edit-user-info" style="background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin-bottom:16px;font-size:13px;color:var(--muted)">Loading…</div>
+
       <div class="edit-field">
-        <label>Coins</label>
-        <input type="number" id="edit-coins" class="input-sm" style="width:100%" min="0" />
+        <label>Add Coins (max +1000 per action)</label>
+        <div class="field-row">
+          <input type="number" id="edit-add-coins" class="input-sm" placeholder="+100" min="1" max="1000" />
+          <button class="btn btn-green" id="btn-add-coins">+ Add</button>
+        </div>
       </div>
       <div class="edit-field">
-        <label>EXP</label>
-        <input type="number" id="edit-exp" class="input-sm" style="width:100%" min="0" />
+        <label>Remove Coins</label>
+        <div class="field-row">
+          <input type="number" id="edit-remove-coins" class="input-sm" placeholder="50" min="1" />
+          <button class="btn btn-red" id="btn-remove-coins">− Remove</button>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="edit-field">
+        <label>Add EXP</label>
+        <div class="field-row">
+          <input type="number" id="edit-add-exp" class="input-sm" placeholder="+25" min="1" />
+          <button class="btn btn-purple" id="btn-add-exp">+ Add</button>
+        </div>
       </div>
       <div class="edit-field">
-        <label>Extra Spins</label>
-        <input type="number" id="edit-spins" class="input-sm" style="width:100%" min="0" />
+        <label>Remove EXP</label>
+        <div class="field-row">
+          <input type="number" id="edit-remove-exp" class="input-sm" placeholder="10" min="1" />
+          <button class="btn btn-red" id="btn-remove-exp">− Remove</button>
+        </div>
       </div>
-      <div style="display:flex;gap:8px;margin-top:16px">
-        <button class="btn btn-green" id="btn-edit-save" style="flex:1">Save Changes</button>
-        <button class="btn btn-red" id="btn-edit-cancel" style="flex:1">Cancel</button>
+
+      <div class="divider"></div>
+
+      <div class="edit-field">
+        <label>Set Level Directly</label>
+        <div class="field-row">
+          <input type="number" id="edit-set-level" class="input-sm" placeholder="e.g. 5" min="1" max="500" />
+          <button class="btn btn-gold" id="btn-set-level">Set</button>
+        </div>
+      </div>
+      <div class="edit-field">
+        <label>Set Extra Spins</label>
+        <div class="field-row">
+          <input type="number" id="edit-spins" class="input-sm" min="0" />
+          <button class="btn btn-blue" id="btn-set-spins">Set</button>
+        </div>
+      </div>
+
+      <div class="danger-zone">
+        <div class="danger-zone-title">⚠️ Danger Zone</div>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+          <button class="btn btn-red" id="btn-ban-user">🚫 Ban User</button>
+          <button class="btn btn-green" id="btn-unban-user" style="display:none">✅ Unban User</button>
+          <span id="ban-status-text" style="font-size:12px;color:var(--muted)"></span>
+        </div>
+      </div>
+
+      <div class="super-admin-zone super-admin-only" id="role-change-zone">
+        <div class="super-admin-zone-title">👑 Role Management</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn btn-gold" id="btn-promote-admin">⬆ Promote to Admin</button>
+          <button class="btn btn-orange" id="btn-demote-admin">⬇ Demote to User</button>
+        </div>
+        <div id="role-status-text" style="font-size:12px;color:var(--muted);margin-top:8px"></div>
+      </div>
+
+      <div style="margin-top:16px">
+        <button class="btn btn-blue" id="btn-edit-close" style="width:100%">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── Confirm Modal ─────────────────────── -->
+  <div id="confirm-modal" class="modal-overlay">
+    <div class="modal-box" style="max-width:360px">
+      <div class="modal-title"><span id="confirm-title">⚠️ Confirm</span></div>
+      <p id="confirm-message" style="color:var(--muted);font-size:14px;margin-bottom:20px;line-height:1.5"></p>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-red" id="btn-confirm-yes" style="flex:1">✅ Confirm</button>
+        <button class="btn btn-blue" id="btn-confirm-no" style="flex:1">❌ Cancel</button>
       </div>
     </div>
   </div>
