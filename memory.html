@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+  <title>NeonSpin — Memory Match</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="style.css"/>
+  <style>
+    .game-page-wrap{padding:20px 16px 100px;max-width:480px;margin:0 auto}
+    .back-link{display:inline-flex;align-items:center;gap:6px;color:var(--clr-muted);font-size:13px;font-weight:600;text-decoration:none;margin-bottom:20px;padding:8px 12px;background:rgba(255,255,255,.05);border-radius:20px;border:1px solid rgba(255,255,255,.08);transition:all .2s}
+    .back-link:hover{color:var(--clr-accent);border-color:rgba(0,212,255,.3);text-decoration:none}
+    .game-title-row{text-align:center;margin-bottom:16px}
+    .game-title-row h1{font-family:var(--font-display);font-size:22px;font-weight:900;background:linear-gradient(135deg,#00ffaa,#00d4ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+    .game-title-row p{color:var(--clr-muted);font-size:13px;margin-top:4px}
+    .mem-card-wrap{background:var(--clr-card);border:1px solid rgba(0,255,170,.2);border-radius:var(--r-lg);padding:16px;box-shadow:0 0 30px rgba(0,255,170,.06)}
+    .mem-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;gap:8px}
+    .mem-stats{display:flex;gap:16px}
+    .mem-stat{text-align:center}
+    .ms-label{display:block;font-size:10px;color:var(--clr-muted);text-transform:uppercase;letter-spacing:.06em;font-weight:600}
+    .ms-val{display:block;font-family:var(--font-display);font-size:18px;font-weight:700;color:var(--clr-accent)}
+    .btn-sm{padding:7px 14px;border-radius:var(--r-sm);font-size:12px;font-weight:600;font-family:var(--font-body);background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.2);color:var(--clr-accent);cursor:pointer;transition:background .2s;flex-shrink:0}
+    .btn-sm:hover{background:rgba(0,212,255,.18)}
+    .game-reward-hint{font-size:12px;color:var(--clr-gold);text-align:center;margin-bottom:12px}
+    .game-result{text-align:center;padding:16px;animation:popIn .3s cubic-bezier(.34,1.56,.64,1)}
+    .game-result.hidden{display:none!important}
+    .result-icon{font-size:44px;margin-bottom:8px}
+    .result-score{font-family:var(--font-display);font-size:40px;font-weight:900;color:var(--clr-gold)}
+    .result-label{font-size:14px;color:var(--clr-muted);margin-bottom:6px}
+    .result-reward{font-size:15px;font-weight:600;color:#39ff14;margin-bottom:8px}
+    .result-unlock{font-size:12px;color:var(--clr-green);margin-bottom:16px}
+    .btn-primary{display:flex;align-items:center;justify-content:center;gap:8px;padding:14px 28px;border-radius:24px;font-family:var(--font-display);font-size:14px;font-weight:700;letter-spacing:.06em;border:none;background:linear-gradient(135deg,var(--clr-accent),var(--clr-accent2));color:#fff;cursor:pointer;transition:opacity .15s,transform .15s;width:100%}
+    .btn-primary:hover{opacity:.9;transform:translateY(-1px)}
+    @keyframes popIn{from{opacity:0;transform:scale(.85)}to{opacity:1;transform:scale(1)}}
+  </style>
+</head>
+<body>
+  <header id="site-header">
+    <div class="header-inner">
+      <div class="logo"><span class="logo-icon">⚡</span><span class="logo-text">NeonSpin</span></div>
+      <div class="header-right" style="font-size:13px;color:var(--clr-muted)">Game 7 of 8</div>
+    </div>
+  </header>
+
+  <main id="app">
+    <div class="game-page-wrap">
+      <a href="games.html" class="back-link">← Back to Games</a>
+      <div class="game-title-row">
+        <h1>🃏 Memory Match</h1>
+        <p>Match all 8 pairs. Fewer moves = more coins!</p>
+      </div>
+
+      <div class="mem-card-wrap">
+        <div class="mem-header">
+          <div class="mem-stats">
+            <div class="mem-stat"><span class="ms-label">Moves</span><span class="ms-val" id="mem-moves">0</span></div>
+            <div class="mem-stat"><span class="ms-label">Best</span><span class="ms-val" id="mem-best">—</span></div>
+            <div class="mem-stat"><span class="ms-label">Pairs</span><span class="ms-val" id="mem-pairs">0/8</span></div>
+          </div>
+          <button id="btn-mem-new" class="btn-sm">New Game</button>
+        </div>
+
+        <div id="mem-grid" class="memory-grid" aria-label="Memory match grid"></div>
+        <p class="game-reward-hint">Match all pairs to earn coins! Fewer moves = more coins!</p>
+
+        <div id="mem-result" class="game-result hidden">
+          <div class="result-icon">🎉</div>
+          <div class="result-score" id="mem-final-moves">0</div>
+          <div class="result-label">moves to complete!</div>
+          <div class="result-reward" id="mem-reward-msg"></div>
+          <button id="btn-mem-retry" class="btn-primary">🔄 Play Again</button>
+          <a href="games.html" style="display:block;text-align:center;margin-top:12px;color:var(--clr-muted);font-size:13px;">← Back to Hub</a>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <nav id="bottom-nav">
+    <a href="index.html" class="nav-btn"><span class="nav-icon">🏠</span><span class="nav-label">Home</span><span class="nav-indicator"></span></a>
+    <a href="games.html" class="nav-btn active"><span class="nav-icon">🎮</span><span class="nav-label">Games</span><span class="nav-indicator"></span></a>
+    <a href="leaderboard.html" class="nav-btn"><span class="nav-icon">🏆</span><span class="nav-label">Ranks</span><span class="nav-indicator"></span></a>
+    <a href="redeem.html" class="nav-btn"><span class="nav-icon">🎁</span><span class="nav-label">Rewards</span><span class="nav-indicator"></span></a>
+    <a href="profile.html" class="nav-btn"><span class="nav-icon">👤</span><span class="nav-label">Profile</span><span class="nav-indicator"></span></a>
+  </nav>
+
+  <script>
+  (() => {
+    const GAME_ID = 7;
+    const LS_BEST = 'ns_mem_best';
+    const EMOJIS  = ['🔥','⚡','💫','🎯','🚀','🦋','🐉','🌙'];
+
+    let cards=[], flipped=[], matched=0, moves=0, lockBoard=false;
+    let best=parseInt(localStorage.getItem(LS_BEST)||'999',10);
+
+    function setText(id,v){ const e=document.getElementById(id); if(e) e.textContent=String(v); }
+    setText('mem-best', best===999?'—':best);
+
+    function newGame(){
+      cards=[]; flipped=[]; matched=0; moves=0; lockBoard=false;
+      setText('mem-moves',0); setText('mem-pairs','0/8');
+      document.getElementById('mem-result').classList.add('hidden');
+      const deck=[...EMOJIS,...EMOJIS].sort(()=>Math.random()-.5).map((emoji,i)=>({id:i,emoji,matched:false}));
+      cards=deck;
+      renderGrid();
+    }
+
+    function renderGrid(){
+      const grid=document.getElementById('mem-grid');
+      if(!grid) return;
+      grid.innerHTML=cards.map(c=>`
+        <div class="mem-card" data-id="${c.id}">
+          <div class="card-back">❓</div>
+          <div class="card-front">${c.emoji}</div>
+        </div>`).join('');
+      grid.querySelectorAll('.mem-card').forEach(el=>{
+        el.addEventListener('click',()=>flipCard(el));
+        el.addEventListener('touchstart',e=>{ e.preventDefault(); flipCard(el); },{passive:false});
+      });
+    }
+
+    function flipCard(el){
+      if(lockBoard) return;
+      const id=parseInt(el.dataset.id,10);
+      const card=cards[id];
+      if(card.matched||flipped.some(f=>f.id===id)) return;
+      el.classList.add('flipped');
+      flipped.push({id,el});
+      if(flipped.length===2){ moves++; setText('mem-moves',moves); checkMatch(); }
+    }
+
+    function checkMatch(){
+      const [a,b]=flipped;
+      if(cards[a.id].emoji===cards[b.id].emoji){
+        cards[a.id].matched=true; cards[b.id].matched=true;
+        a.el.classList.add('matched'); b.el.classList.add('matched');
+        matched++; setText('mem-pairs',`${matched}/8`); flipped=[];
+        if(matched===8) endGame();
+      } else {
+        lockBoard=true;
+        setTimeout(()=>{ a.el.classList.remove('flipped'); b.el.classList.remove('flipped'); flipped=[]; lockBoard=false; },900);
+      }
+    }
+
+    function endGame(){
+      if(moves<best){ best=moves; localStorage.setItem(LS_BEST,String(best)); setText('mem-best',best); }
+      const coins=moves<=12?30:moves<=20?20:moves<=30?12:5;
+      setText('mem-final-moves',moves);
+      setText('mem-reward-msg',`+${coins} Coins earned!`);
+
+      // ── HYBRID SYNC: award coins to localStorage + Firebase ──
+      window.__ns_giveReward?.('coins', coins, '🃏', 'Memory Match!');
+
+      document.getElementById('mem-result').classList.remove('hidden');
+    }
+
+    document.getElementById('btn-mem-new').addEventListener('click',newGame);
+    document.getElementById('btn-mem-retry').addEventListener('click',newGame);
+    newGame();
+    if(localStorage.getItem('ns_theme')==='light') document.body.classList.add('light-theme');
+  })();
+  </script>
+  <script type="module" src="game-bridge.js"></script>
+</body>
+</html>

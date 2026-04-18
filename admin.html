@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NeonSpin — Admin Dashboard</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      --bg:      #080b14;
+      --surface: #0d1120;
+      --card:    #121827;
+      --border:  rgba(0,212,255,.14);
+      --text:    #e2e8f0;
+      --muted:   #7f8ea3;
+      --accent:  #00d4ff;
+      --accent2: #a855f7;
+      --gold:    #fbbf24;
+      --green:   #39ff14;
+      --red:     #ff4444;
+      --orange:  #ff7b35;
+      --font-d:  'Orbitron', monospace;
+      --font-b:  'Rajdhani', sans-serif;
+      --r:       12px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--font-b);
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      font-size: 14px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    a { color: var(--accent); text-decoration: none; }
+    button { font-family: var(--font-b); cursor: pointer; border: none; }
+    input, select, textarea { font-family: var(--font-b); }
+
+    /* ── Login Screen ── */
+    #login-screen {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(ellipse at 50% 0%, rgba(0,212,255,.06) 0%, transparent 60%);
+    }
+
+    .login-box {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 36px 32px;
+      width: 360px;
+      text-align: center;
+      box-shadow: 0 24px 80px rgba(0,0,0,.5);
+    }
+
+    .login-logo {
+      font-family: var(--font-d);
+      font-size: 24px;
+      font-weight: 900;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 6px;
+    }
+
+    .login-sub {
+      color: var(--muted);
+      font-size: 12px;
+      margin-bottom: 28px;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+    }
+
+    .admin-badge {
+      display: inline-block;
+      background: rgba(255,123,53,.12);
+      border: 1px solid rgba(255,123,53,.3);
+      color: var(--orange);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      border-radius: 20px;
+      padding: 4px 12px;
+      margin-bottom: 20px;
+    }
+
+    .btn-google-admin {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      width: 100%;
+      padding: 14px;
+      border-radius: var(--r);
+      background: #fff;
+      color: #3c4043;
+      font-weight: 600;
+      font-size: 15px;
+      border: 1px solid #dadce0;
+      transition: box-shadow .2s;
+    }
+
+    .btn-google-admin:hover { box-shadow: 0 4px 16px rgba(0,0,0,.15); }
+
+    #login-error {
+      margin-top: 12px;
+      color: var(--red);
+      font-size: 13px;
+      display: none;
+    }
+
+    /* ── Dashboard Layout ── */
+    #dashboard { display: none; }
+
+    .dash-header {
+      background: rgba(8,11,20,.92);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .dash-logo {
+      font-family: var(--font-d);
+      font-size: 16px;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .dash-user {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .btn-logout {
+      padding: 6px 14px;
+      border-radius: 20px;
+      background: rgba(255,68,68,.1);
+      border: 1px solid rgba(255,68,68,.2);
+      color: var(--red);
+      font-size: 12px;
+      font-weight: 600;
+      transition: background .2s;
+    }
+
+    .btn-logout:hover { background: rgba(255,68,68,.18); }
+
+    .dash-body {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 24px 20px;
+    }
+
+    /* ── Stat Cards ── */
+    .stat-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 14px;
+      margin-bottom: 28px;
+    }
+
+    .stat-box {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 18px 16px;
+    }
+
+    .stat-box-label {
+      font-size: 11px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      margin-bottom: 6px;
+    }
+
+    .stat-box-value {
+      font-family: var(--font-d);
+      font-size: 26px;
+      font-weight: 700;
+      color: var(--accent);
+    }
+
+    /* ── Sections ── */
+    .section {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      margin-bottom: 20px;
+      overflow: hidden;
+    }
+
+    .section-head {
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .section-title {
+      font-family: var(--font-d);
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .section-body {
+      padding: 16px 18px;
+    }
+
+    /* ── Table ── */
+    .table-wrap {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    th {
+      text-align: left;
+      padding: 8px 12px;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      color: var(--muted);
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+
+    td {
+      padding: 10px 12px;
+      border-bottom: 1px solid rgba(255,255,255,.04);
+      vertical-align: middle;
+    }
+
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: rgba(255,255,255,.02); }
+
+    /* ── Badges ── */
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .badge-pending  { background: rgba(251,191,36,.12); color: var(--gold); border: 1px solid rgba(251,191,36,.25); }
+    .badge-approved { background: rgba(57,255,20,.1);   color: var(--green); border: 1px solid rgba(57,255,20,.2); }
+    .badge-rejected { background: rgba(255,68,68,.1);   color: var(--red);   border: 1px solid rgba(255,68,68,.2); }
+
+    /* ── Buttons ── */
+    .btn {
+      padding: 6px 14px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      transition: opacity .15s;
+      cursor: pointer;
+    }
+
+    .btn:hover { opacity: .8; }
+    .btn-green  { background: rgba(57,255,20,.15);  color: var(--green);  border: 1px solid rgba(57,255,20,.25); }
+    .btn-red    { background: rgba(255,68,68,.12);  color: var(--red);    border: 1px solid rgba(255,68,68,.2); }
+    .btn-blue   { background: rgba(0,212,255,.1);   color: var(--accent); border: 1px solid rgba(0,212,255,.2); }
+    .btn-orange { background: rgba(255,123,53,.1);  color: var(--orange); border: 1px solid rgba(255,123,53,.2); }
+
+    /* ── Search / controls ── */
+    .input-sm {
+      background: rgba(255,255,255,.04);
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 8px;
+      padding: 7px 12px;
+      color: var(--text);
+      font-size: 13px;
+      font-family: var(--font-b);
+      outline: none;
+      transition: border-color .2s;
+    }
+
+    .input-sm:focus { border-color: var(--accent); }
+
+    /* ── Edit user modal ── */
+    #edit-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 500;
+      background: rgba(0,0,0,.75);
+      backdrop-filter: blur(6px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    #edit-modal.open { display: flex; }
+
+    .edit-box {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px;
+      width: 100%;
+      max-width: 380px;
+    }
+
+    .edit-title {
+      font-family: var(--font-d);
+      font-size: 15px;
+      color: var(--accent);
+      margin-bottom: 16px;
+    }
+
+    .edit-field {
+      margin-bottom: 12px;
+    }
+
+    .edit-field label {
+      display: block;
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+
+    /* ── Toast ── */
+    #toast {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%) translateY(60px);
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 30px;
+      padding: 10px 20px;
+      font-size: 13px;
+      font-weight: 600;
+      z-index: 9999;
+      pointer-events: none;
+      transition: transform .3s ease, opacity .3s ease;
+      opacity: 0;
+      white-space: nowrap;
+      box-shadow: 0 8px 32px rgba(0,0,0,.4);
+    }
+
+    #toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+    /* ── Broadcast textarea ── */
+    .broadcast-form {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    /* ── Pagination ── */
+    .pagination {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    /* ── Empty state ── */
+    .empty-row td {
+      text-align: center;
+      padding: 28px;
+      color: var(--muted);
+    }
+
+    /* ── Feedback images ── */
+    .fb-img {
+      max-width: 80px;
+      max-height: 60px;
+      border-radius: 6px;
+      object-fit: cover;
+    }
+
+    @media (max-width: 600px) {
+      .dash-body { padding: 14px 12px; }
+      .stat-row { grid-template-columns: repeat(2, 1fr); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ─── Login ─────────────────────────────────── -->
+  <div id="login-screen">
+    <div class="login-box">
+      <div class="login-logo">⚡ NeonSpin</div>
+      <div class="login-sub">Admin Dashboard</div>
+      <div class="admin-badge">🔒 Restricted Access</div>
+
+      <button id="btn-admin-login" class="btn-google-admin">
+        <svg width="20" height="20" viewBox="0 0 18 18">
+          <path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z"/>
+          <path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.258c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 009 18z"/>
+          <path fill="#FBBC05" d="M3.964 10.707A5.41 5.41 0 013.682 9c0-.593.102-1.17.282-1.707V4.961H.957A8.996 8.996 0 000 9c0 1.452.348 2.827.957 4.039l3.007-2.332z"/>
+          <path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 00.957 4.96l3.007 2.332C4.672 5.163 6.656 3.58 9 3.58z"/>
+        </svg>
+        Sign in with Google
+      </button>
+
+      <div id="login-error"></div>
+    </div>
+  </div>
+
+  <!-- ─── Dashboard ─────────────────────────────── -->
+  <div id="dashboard">
+
+    <header class="dash-header">
+      <div class="dash-logo">⚡ Admin Panel</div>
+      <div class="dash-user">
+        <span id="admin-name"></span>
+        <button id="btn-admin-logout" class="btn-logout">Sign Out</button>
+      </div>
+    </header>
+
+    <div class="dash-body">
+
+      <!-- Stats row -->
+      <div class="stat-row">
+        <div class="stat-box">
+          <div class="stat-box-label">Total Users</div>
+          <div class="stat-box-value" id="stat-users">—</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-box-label">Pending Requests</div>
+          <div class="stat-box-value" id="stat-pending">—</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-box-label">Feedback Items</div>
+          <div class="stat-box-value" id="stat-feedback">—</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-box-label">Highest Level</div>
+          <div class="stat-box-value" id="stat-max-level">—</div>
+        </div>
+      </div>
+
+      <!-- Users Table -->
+      <div class="section">
+        <div class="section-head">
+          <div class="section-title">👥 Users</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <input type="text" id="user-search" class="input-sm" placeholder="Search by name…" />
+            <button class="btn btn-blue" id="btn-export">⬇ Export JSON</button>
+          </div>
+        </div>
+        <div class="section-body">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Level</th>
+                  <th>Coins</th>
+                  <th>EXP</th>
+                  <th>Streak</th>
+                  <th>Joined</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="users-tbody">
+                <tr class="empty-row"><td colspan="8">Loading users…</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="pagination">
+            <button class="btn btn-blue" id="btn-prev-page">◀ Prev</button>
+            <span id="page-info" style="color:var(--muted);font-size:12px"></span>
+            <button class="btn btn-blue" id="btn-next-page">Next ▶</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Reward Requests -->
+      <div class="section">
+        <div class="section-head">
+          <div class="section-title">🎁 Reward Requests</div>
+          <span class="badge badge-pending" id="pending-count-badge">0 pending</span>
+        </div>
+        <div class="section-body">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Level</th>
+                  <th>Coins</th>
+                  <th>Streak</th>
+                  <th>Status</th>
+                  <th>Date</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="requests-tbody">
+                <tr class="empty-row"><td colspan="8">Loading…</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Feedback -->
+      <div class="section">
+        <div class="section-head">
+          <div class="section-title">💬 Community Feedback</div>
+        </div>
+        <div class="section-body">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Message</th>
+                  <th>Image</th>
+                  <th>Date</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="feedback-tbody">
+                <tr class="empty-row"><td colspan="5">Loading…</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Broadcast -->
+      <div class="section">
+        <div class="section-head">
+          <div class="section-title">📢 Broadcast Message</div>
+        </div>
+        <div class="section-body">
+          <div class="broadcast-form">
+            <input type="text" id="bc-title" class="input-sm" placeholder="Broadcast title…" />
+            <textarea id="bc-msg" class="input-sm" rows="3" placeholder="Message to all users…" style="resize:vertical"></textarea>
+            <button class="btn btn-orange" id="btn-broadcast" style="align-self:flex-start">📣 Send Broadcast</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Send Redeem to User -->
+      <div class="section">
+        <div class="section-head">
+          <div class="section-title">💎 Send Redeem to User</div>
+        </div>
+        <div class="section-body" style="display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end">
+          <div>
+            <label style="font-size:12px;color:var(--muted);display:block;margin-bottom:4px">User UID or Email</label>
+            <input type="text" id="redeem-uid" class="input-sm" placeholder="UID or email…" style="width:260px" />
+          </div>
+          <div>
+            <label style="font-size:12px;color:var(--muted);display:block;margin-bottom:4px">Redeem Code / Note</label>
+            <input type="text" id="redeem-note" class="input-sm" placeholder="e.g. PROMO-XYZ or reward note" style="width:220px" />
+          </div>
+          <button class="btn btn-green" id="btn-send-redeem">✅ Send Redeem</button>
+        </div>
+      </div>
+
+    </div><!-- /dash-body -->
+  </div><!-- /dashboard -->
+
+  <!-- Edit user modal -->
+  <div id="edit-modal">
+    <div class="edit-box">
+      <div class="edit-title">✏️ Edit User</div>
+      <input type="hidden" id="edit-uid" />
+      <div class="edit-field">
+        <label>Coins</label>
+        <input type="number" id="edit-coins" class="input-sm" style="width:100%" min="0" />
+      </div>
+      <div class="edit-field">
+        <label>EXP</label>
+        <input type="number" id="edit-exp" class="input-sm" style="width:100%" min="0" />
+      </div>
+      <div class="edit-field">
+        <label>Extra Spins</label>
+        <input type="number" id="edit-spins" class="input-sm" style="width:100%" min="0" />
+      </div>
+      <div style="display:flex;gap:8px;margin-top:16px">
+        <button class="btn btn-green" id="btn-edit-save" style="flex:1">Save Changes</button>
+        <button class="btn btn-red" id="btn-edit-cancel" style="flex:1">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast"></div>
+
+  <script type="module" src="admin.js"></script>
+</body>
+</html>

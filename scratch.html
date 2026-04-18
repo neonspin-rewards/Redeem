@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+  <title>NeonSpin — Scratch Card</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="style.css"/>
+  <style>
+    .game-page-wrap{padding:20px 16px 100px;max-width:480px;margin:0 auto}
+    .back-link{display:inline-flex;align-items:center;gap:6px;color:var(--clr-muted);font-size:13px;font-weight:600;text-decoration:none;margin-bottom:20px;padding:8px 12px;background:rgba(255,255,255,.05);border-radius:20px;border:1px solid rgba(255,255,255,.08);transition:all .2s}
+    .back-link:hover{color:var(--clr-accent);border-color:rgba(0,212,255,.3);text-decoration:none}
+    .game-title-row{text-align:center;margin-bottom:24px}
+    .game-title-row h1{font-family:var(--font-display);font-size:22px;font-weight:900;background:linear-gradient(135deg,#a855f7,#00d4ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+    .game-title-row p{color:var(--clr-muted);font-size:13px;margin-top:4px}
+    .scratch-card{background:var(--clr-card);border:1px solid rgba(168,85,247,.3);border-radius:var(--r-lg);padding:20px;margin-bottom:20px;box-shadow:0 0 30px rgba(168,85,247,.15)}
+    .scratch-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px}
+    .scratch-cell{aspect-ratio:1;border-radius:var(--r-md);background:rgba(168,85,247,.2);border:2px solid rgba(168,85,247,.4);display:flex;align-items:center;justify-content:center;font-size:28px;cursor:pointer;transition:transform .15s,background .2s;user-select:none;touch-action:manipulation;position:relative;overflow:hidden}
+    .scratch-cell.cover{background:linear-gradient(135deg,rgba(168,85,247,.4),rgba(0,212,255,.3))}
+    .scratch-cell.cover::before{content:"?";font-family:var(--font-display);font-size:22px;font-weight:900;color:rgba(255,255,255,.6)}
+    .scratch-cell.cover span{display:none}
+    .scratch-cell.revealed{background:rgba(0,0,0,.4);cursor:default;transform:scale(1.05)}
+    .scratch-cell:active:not(.revealed){transform:scale(.92)}
+    .scratch-hint{text-align:center;font-size:13px;color:var(--clr-muted);margin-bottom:4px}
+    .scratch-matches{text-align:center;font-size:14px;font-weight:600;color:var(--clr-accent);margin-bottom:16px;min-height:20px}
+    .result-panel{text-align:center;padding:20px;animation:popIn .35s cubic-bezier(.34,1.56,.64,1)}
+    .result-big{font-family:var(--font-display);font-size:44px;font-weight:900;color:var(--clr-gold)}
+    .result-sub{font-size:14px;color:var(--clr-muted);margin:4px 0 6px}
+    .result-unlock{font-size:12px;color:var(--clr-green);margin-bottom:20px}
+    .btn-primary{display:flex;align-items:center;justify-content:center;gap:8px;padding:14px 28px;border-radius:24px;font-family:var(--font-display);font-size:14px;font-weight:700;letter-spacing:.06em;border:none;background:linear-gradient(135deg,var(--clr-accent),var(--clr-accent2));color:#fff;cursor:pointer;transition:opacity .15s,transform .15s;width:100%}
+    .btn-primary:hover{opacity:.9;transform:translateY(-1px)}
+    .hidden{display:none!important}
+    @keyframes popIn{from{opacity:0;transform:scale(.85)}to{opacity:1;transform:scale(1)}}
+    @keyframes revealPop{0%{transform:scale(.7)}70%{transform:scale(1.15)}100%{transform:scale(1.05)}}
+  </style>
+</head>
+<body>
+  <header id="site-header">
+    <div class="header-inner">
+      <div class="logo"><span class="logo-icon">⚡</span><span class="logo-text">NeonSpin</span></div>
+      <div class="header-right" style="font-size:13px;color:var(--clr-muted)">Game 2 of 8</div>
+    </div>
+  </header>
+
+  <main id="app">
+    <div class="game-page-wrap">
+      <a href="games.html" class="back-link">← Back to Games</a>
+      <div class="game-title-row">
+        <h1>🎴 Scratch Card</h1>
+        <p>Tap each cell to reveal. Match 3 to win big!</p>
+      </div>
+
+      <div class="scratch-card">
+        <div id="scratch-grid" class="scratch-grid"></div>
+        <p class="scratch-hint" id="scratch-hint">Tap all 9 cells to reveal your prizes!</p>
+        <p class="scratch-matches" id="scratch-matches"></p>
+
+        <div id="result-panel" class="result-panel hidden">
+          <div class="result-big" id="result-big">+0</div>
+          <div class="result-sub">Coins Earned!</div>
+          <button class="btn-primary" id="new-card-btn">🃏 New Card</button>
+          <a href="games.html" style="display:block;text-align:center;margin-top:12px;color:var(--clr-muted);font-size:13px;">← Back to Hub</a>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <nav id="bottom-nav">
+    <a href="index.html" class="nav-btn"><span class="nav-icon">🏠</span><span class="nav-label">Home</span><span class="nav-indicator"></span></a>
+    <a href="games.html" class="nav-btn active"><span class="nav-icon">🎮</span><span class="nav-label">Games</span><span class="nav-indicator"></span></a>
+    <a href="leaderboard.html" class="nav-btn"><span class="nav-icon">🏆</span><span class="nav-label">Ranks</span><span class="nav-indicator"></span></a>
+    <a href="redeem.html" class="nav-btn"><span class="nav-icon">🎁</span><span class="nav-label">Rewards</span><span class="nav-indicator"></span></a>
+    <a href="profile.html" class="nav-btn"><span class="nav-icon">👤</span><span class="nav-label">Profile</span><span class="nav-indicator"></span></a>
+  </nav>
+
+  <script>
+  (() => {
+    const GAME_ID = 2;
+    const SYMBOLS = ['💰','⭐','💎','🔥','🎯','🚀'];
+    const COINS   = { '💰':50,'⭐':30,'💎':100,'🔥':20,'🎯':40,'🚀':75 };
+
+    let revealed = 0;
+    let cells = [];
+
+    function newCard() {
+      revealed = 0;
+      document.getElementById('result-panel').classList.add('hidden');
+      document.getElementById('scratch-hint').textContent = 'Tap all 9 cells to reveal your prizes!';
+      document.getElementById('scratch-matches').textContent = '';
+
+      // Build 9-cell deck: guarantee some matches
+      const pick1 = SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)];
+      const pick2 = SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)];
+      cells = [pick1, pick1, pick2, pick2, pick2];
+      while (cells.length < 9) cells.push(SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)]);
+      cells.sort(() => Math.random() - .5);
+
+      const grid = document.getElementById('scratch-grid');
+      grid.innerHTML = '';
+      cells.forEach((sym, i) => {
+        const el = document.createElement('div');
+        el.className = 'scratch-cell cover';
+        el.innerHTML = `<span>${sym}</span>`;
+        el.dataset.idx = i;
+        el.addEventListener('click', () => revealCell(el, sym));
+        el.addEventListener('touchend', e => { e.preventDefault(); revealCell(el, sym); }, {passive:false});
+        grid.appendChild(el);
+      });
+    }
+
+    function revealCell(el, sym) {
+      if (!el.classList.contains('cover')) return;
+      el.classList.remove('cover');
+      el.classList.add('revealed');
+      el.style.animation = 'revealPop .3s ease';
+      revealed++;
+
+      if (revealed === 9) calcResult();
+    }
+
+    function calcResult() {
+      const counts = {};
+      cells.forEach(s => counts[s] = (counts[s] || 0) + 1);
+      let coins = 0;
+      let matches = [];
+      for (const [sym, cnt] of Object.entries(counts)) {
+        if (cnt >= 3) { coins += COINS[sym] * cnt; matches.push(`${sym}×${cnt}`); }
+        else if (cnt === 2) { coins += Math.floor(COINS[sym] * 0.5); }
+      }
+      if (coins === 0) coins = 5;
+
+      const matchText = matches.length ? `Match: ${matches.join(' + ')} 🎉` : 'No triple match — consolation prize';
+      document.getElementById('scratch-matches').textContent = matchText;
+      document.getElementById('scratch-hint').textContent = 'All revealed!';
+      document.getElementById('result-big').textContent = '+' + coins;
+
+      // ── HYBRID SYNC: award coins to localStorage + Firebase ──
+      window.__ns_giveReward?.('coins', coins, '🎴', 'Scratch Card!');
+
+      document.getElementById('result-panel').classList.remove('hidden');
+    }
+
+    document.getElementById('new-card-btn').addEventListener('click', newCard);
+    newCard();
+    if (localStorage.getItem('ns_theme') === 'light') document.body.classList.add('light-theme');
+  })();
+  </script>
+  <script type="module" src="game-bridge.js"></script>
+</body>
+</html>

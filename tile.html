@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+  <title>NeonSpin — Tile Tap</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="style.css"/>
+  <style>
+    .game-page-wrap{padding:20px 16px 100px;max-width:480px;margin:0 auto}
+    .back-link{display:inline-flex;align-items:center;gap:6px;color:var(--clr-muted);font-size:13px;font-weight:600;text-decoration:none;margin-bottom:20px;padding:8px 12px;background:rgba(255,255,255,.05);border-radius:20px;border:1px solid rgba(255,255,255,.08);transition:all .2s}
+    .back-link:hover{color:var(--clr-accent);border-color:rgba(0,212,255,.3);text-decoration:none}
+    .game-title-row{text-align:center;margin-bottom:16px}
+    .game-title-row h1{font-family:var(--font-display);font-size:22px;font-weight:900;background:linear-gradient(135deg,#ff4488,#a855f7);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+    .game-title-row p{color:var(--clr-muted);font-size:13px;margin-top:4px}
+    .tile-card{background:var(--clr-card);border:1px solid rgba(255,68,136,.2);border-radius:var(--r-lg);padding:20px;box-shadow:0 0 30px rgba(255,68,136,.08)}
+    .tile-stats{display:flex;justify-content:space-between;margin-bottom:16px;gap:10px}
+    .tile-stat{flex:1;text-align:center;background:rgba(255,255,255,.04);border-radius:var(--r-md);padding:10px 8px}
+    .ts-label{font-size:10px;color:var(--clr-muted);text-transform:uppercase;letter-spacing:.06em;font-weight:600;display:block}
+    .ts-val{font-family:var(--font-display);font-size:20px;font-weight:900;color:var(--clr-accent);display:block}
+    .tile-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
+    .tile-cell{aspect-ratio:1;border-radius:var(--r-md);display:flex;align-items:center;justify-content:center;font-size:28px;cursor:pointer;transition:transform .1s,box-shadow .15s;touch-action:manipulation;user-select:none;background:rgba(255,255,255,.05);border:2px solid rgba(255,255,255,.08)}
+    .tile-cell.target{background:linear-gradient(135deg,rgba(255,68,136,.35),rgba(168,85,247,.35));border-color:rgba(255,68,136,.7);box-shadow:0 0 20px rgba(255,68,136,.4);animation:tileGlow .5s ease-in-out infinite alternate}
+    .tile-cell:active{transform:scale(.88)}
+    .tile-cell.flash-hit{background:rgba(57,255,20,.3)!important;border-color:rgba(57,255,20,.7)!important}
+    .tile-cell.flash-miss{background:rgba(255,68,68,.3)!important;border-color:rgba(255,68,68,.7)!important}
+    .tile-info{text-align:center;font-size:14px;color:var(--clr-muted);min-height:20px;margin-bottom:8px}
+    .tile-speed-bar{height:6px;background:rgba(255,255,255,.08);border-radius:3px;margin-bottom:16px;overflow:hidden}
+    .tile-speed-fill{height:100%;background:linear-gradient(90deg,#ff4488,#a855f7);border-radius:3px;transition:width .3s ease}
+    .start-panel,.result-panel{text-align:center;padding:16px}
+    .start-panel h3{font-family:var(--font-display);font-size:18px;color:var(--clr-accent);margin-bottom:8px}
+    .start-panel p{color:var(--clr-muted);font-size:13px;margin-bottom:20px;line-height:1.5}
+    .result-big{font-family:var(--font-display);font-size:40px;font-weight:900;color:var(--clr-gold)}
+    .result-sub{font-size:14px;color:var(--clr-muted);margin:4px 0 6px}
+    .result-unlock{font-size:12px;color:var(--clr-green);margin-bottom:16px}
+    .btn-primary{display:flex;align-items:center;justify-content:center;gap:8px;padding:14px 28px;border-radius:24px;font-family:var(--font-display);font-size:14px;font-weight:700;letter-spacing:.06em;border:none;background:linear-gradient(135deg,var(--clr-accent),var(--clr-accent2));color:#fff;cursor:pointer;transition:opacity .15s,transform .15s;width:100%}
+    .btn-primary:hover{opacity:.9;transform:translateY(-1px)}
+    .hidden{display:none!important}
+    @keyframes tileGlow{from{box-shadow:0 0 12px rgba(255,68,136,.4)}to{box-shadow:0 0 28px rgba(255,68,136,.8),0 0 50px rgba(168,85,247,.3)}}
+    @keyframes popIn{from{opacity:0;transform:scale(.85)}to{opacity:1;transform:scale(1)}}
+  </style>
+</head>
+<body>
+  <header id="site-header">
+    <div class="header-inner">
+      <div class="logo"><span class="logo-icon">⚡</span><span class="logo-text">NeonSpin</span></div>
+      <div class="header-right" style="font-size:13px;color:var(--clr-muted)">Game 6 of 8</div>
+    </div>
+  </header>
+
+  <main id="app">
+    <div class="game-page-wrap">
+      <a href="games.html" class="back-link">← Back to Games</a>
+      <div class="game-title-row">
+        <h1>🎯 Tile Tap</h1>
+        <p>Tap the glowing tile. Miss = Game Over!</p>
+      </div>
+
+      <div class="tile-card">
+        <!-- Stats -->
+        <div class="tile-stats">
+          <div class="tile-stat"><span class="ts-label">Streak</span><span class="ts-val" id="t-streak">0</span></div>
+          <div class="tile-stat"><span class="ts-label">Best</span><span class="ts-val" id="t-best">0</span></div>
+          <div class="tile-stat"><span class="ts-label">Speed</span><span class="ts-val" id="t-speed">—</span></div>
+        </div>
+
+        <!-- Speed timer bar -->
+        <div class="tile-speed-bar"><div class="tile-speed-fill" id="t-bar" style="width:100%"></div></div>
+
+        <!-- Grid -->
+        <div class="tile-grid" id="tile-grid"></div>
+        <div class="tile-info" id="t-info">Hit the glowing tile before time runs out!</div>
+
+        <!-- Start panel -->
+        <div id="start-panel" class="start-panel">
+          <h3>🎯 Tile Tap</h3>
+          <p>A tile will glow — tap it fast!<br>Each hit speeds things up.<br>Miss or run out of time = Game Over.</p>
+          <button class="btn-primary" id="start-btn">▶ Start Game</button>
+        </div>
+
+        <!-- Result panel -->
+        <div id="result-panel" class="result-panel hidden" style="animation:popIn .35s cubic-bezier(.34,1.56,.64,1)">
+          <div style="font-size:48px;margin-bottom:12px" id="r-icon">🎯</div>
+          <div class="result-big" id="r-coins">+0</div>
+          <div class="result-sub">Coins Earned!</div>
+          <div style="font-size:14px;color:var(--clr-muted);margin-bottom:8px" id="r-streak-line"></div>
+          <button class="btn-primary" id="retry-btn">🔄 Play Again</button>
+          <a href="games.html" style="display:block;text-align:center;margin-top:12px;color:var(--clr-muted);font-size:13px;">← Back to Hub</a>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <nav id="bottom-nav">
+    <a href="index.html" class="nav-btn"><span class="nav-icon">🏠</span><span class="nav-label">Home</span><span class="nav-indicator"></span></a>
+    <a href="games.html" class="nav-btn active"><span class="nav-icon">🎮</span><span class="nav-label">Games</span><span class="nav-indicator"></span></a>
+    <a href="leaderboard.html" class="nav-btn"><span class="nav-icon">🏆</span><span class="nav-label">Ranks</span><span class="nav-indicator"></span></a>
+    <a href="redeem.html" class="nav-btn"><span class="nav-icon">🎁</span><span class="nav-label">Rewards</span><span class="nav-indicator"></span></a>
+    <a href="profile.html" class="nav-btn"><span class="nav-icon">👤</span><span class="nav-label">Profile</span><span class="nav-indicator"></span></a>
+  </nav>
+
+  <script>
+  (() => {
+    const GAME_ID = 6;
+    const LS_BEST = 'ns_tile_best';
+    const EMOJIS  = ['⭐','🔥','💥','💎','🎯','🚀','⚡','🌟','🎪'];
+    const GRID_SIZE = 9;
+
+    let streak=0, best=parseInt(localStorage.getItem(LS_BEST)||'0',10), running=false;
+    let targetIdx=-1, timeoutId=null, barInterval=null, barPct=100;
+    let baseDelay=2000; // ms — decreases with streak
+
+    function setText(id,v){ const e=document.getElementById(id); if(e) e.textContent=String(v); }
+    setText('t-best', best);
+
+    function buildGrid(){
+      const grid=document.getElementById('tile-grid');
+      grid.innerHTML='';
+      for(let i=0;i<GRID_SIZE;i++){
+        const cell=document.createElement('div');
+        cell.className='tile-cell';
+        cell.dataset.idx=i;
+        cell.textContent=EMOJIS[i];
+        cell.addEventListener('click',()=>onTap(i));
+        cell.addEventListener('touchend',e=>{ e.preventDefault(); onTap(i); },{passive:false});
+        grid.appendChild(cell);
+      }
+    }
+
+    function startGame(){
+      streak=0; running=true; baseDelay=2000;
+      setText('t-streak',0);
+      document.getElementById('start-panel').classList.add('hidden');
+      document.getElementById('result-panel').classList.add('hidden');
+      document.getElementById('t-info').textContent='Tap the glowing tile!';
+      buildGrid();
+      nextTarget();
+    }
+
+    function nextTarget(){
+      clearTimeout(timeoutId);
+      clearInterval(barInterval);
+      barPct=100;
+      document.getElementById('t-bar').style.width='100%';
+
+      // Remove previous target
+      document.querySelectorAll('.tile-cell').forEach(c=>c.classList.remove('target'));
+
+      // Pick new target (different from previous)
+      let idx;
+      do { idx=Math.floor(Math.random()*GRID_SIZE); } while(idx===targetIdx);
+      targetIdx=idx;
+
+      const cells=document.querySelectorAll('.tile-cell');
+      cells[idx].classList.add('target');
+
+      const delay=Math.max(600, baseDelay - streak*80);
+      setText('t-speed', streak < 5 ? 'Normal' : streak < 10 ? 'Fast' : 'Insane!');
+
+      const step = 50;
+      barInterval=setInterval(()=>{
+        barPct = Math.max(0, barPct - (step/delay)*100);
+        document.getElementById('t-bar').style.width=barPct+'%';
+      }, step);
+
+      timeoutId=setTimeout(()=>{ if(running) endGame(); }, delay);
+    }
+
+    function onTap(idx){
+      if(!running) return;
+      if(idx===targetIdx){
+        // Hit!
+        clearTimeout(timeoutId);
+        clearInterval(barInterval);
+        const cells=document.querySelectorAll('.tile-cell');
+        cells[idx].classList.remove('target');
+        cells[idx].classList.add('flash-hit');
+        setTimeout(()=>cells[idx].classList.remove('flash-hit'),200);
+        streak++;
+        setText('t-streak',streak);
+        document.getElementById('t-info').textContent=`Streak ${streak}! Keep going!`;
+        nextTarget();
+      } else {
+        // Miss
+        clearTimeout(timeoutId);
+        clearInterval(barInterval);
+        const cells=document.querySelectorAll('.tile-cell');
+        cells[idx].classList.add('flash-miss');
+        cells[targetIdx].classList.remove('target');
+        setTimeout(()=>endGame(), 300);
+      }
+    }
+
+    function endGame(){
+      running=false;
+      clearTimeout(timeoutId);
+      clearInterval(barInterval);
+
+      if(streak>best){ best=streak; localStorage.setItem(LS_BEST,String(best)); setText('t-best',best); }
+
+      const coins=streak>=20?50:streak>=15?35:streak>=10?25:streak>=5?15:streak>=3?8:3;
+      document.getElementById('r-icon').textContent=streak>=10?'🏆':streak>=5?'🎯':'💫';
+      setText('r-coins','+'+coins);
+      document.getElementById('r-streak-line').textContent=`Streak of ${streak} — Best: ${best}`;
+
+      // ── HYBRID SYNC: award coins to localStorage + Firebase ──
+      window.__ns_giveReward?.('coins', coins, '🎯', 'Tile Tap!');
+
+      document.getElementById('result-panel').classList.remove('hidden');
+    }
+
+    document.getElementById('start-btn').addEventListener('click',startGame);
+    document.getElementById('retry-btn').addEventListener('click',startGame);
+
+    buildGrid();
+    if(localStorage.getItem('ns_theme')==='light') document.body.classList.add('light-theme');
+  })();
+  </script>
+  <script type="module" src="game-bridge.js"></script>
+</body>
+</html>

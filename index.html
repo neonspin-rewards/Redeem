@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="description" content="NeonSpin — Spin the wheel, earn rewards and dominate the leaderboard." />
+  <meta name="theme-color" content="#080b14" />
+  <meta property="og:title" content="NeonSpin — Gaming Rewards" />
+  <meta property="og:description" content="Spin, earn coins, level up and dominate the leaderboard." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://neonspin-rewards.github.io/Redeem/" />
+  <title>NeonSpin — Home</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <div id="particles-bg" aria-hidden="true"></div>
+
+  <!-- ══ LOADING SCREEN ══ -->
+  <div id="loading-screen" style="display:none">
+    <div class="loading-inner">
+      <div class="loading-logo">
+        <span class="logo-icon">⚡</span>
+        <span class="logo-text">NeonSpin</span>
+      </div>
+      <div class="loading-spinner" aria-label="Loading…"></div>
+      <p class="loading-text" id="loading-status">Initialising…</p>
+    </div>
+  </div>
+
+  <!-- ══ TERMS MODAL ══ -->
+  <div id="terms-overlay" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="terms-title">
+    <div class="modal-box terms-box">
+      <div class="modal-hero-icon">📜</div>
+      <h2 class="modal-title" id="terms-title">Before You Play</h2>
+      <div class="terms-scroll">
+        <p class="terms-intro">Welcome to <strong>NeonSpin</strong>. A fun, relaxing reward experience — enjoy it at your own pace.</p>
+        <p>Rewards appear based on luck and basic conditions. They aren't fixed or guaranteed — that's what keeps things exciting!</p>
+        <p>Coins and EXP are in-platform only and carry <strong>no real-world monetary value</strong>.</p>
+        <p>Your account is secured via Firebase Authentication. Your data is never sold or shared.</p>
+        <p>Any misuse (bots, exploits) may result in a permanent ban to keep things fair for everyone.</p>
+        <p class="terms-contact">Questions? Email us: <a href="mailto:neonspin.support@gmail.com">neonspin.support@gmail.com</a></p>
+      </div>
+      <button id="btn-accept-terms" class="btn-primary btn-glow">
+        <span class="btn-icon">✅</span>
+        <span class="btn-text">I Understand — Continue</span>
+        <span class="btn-ripple" aria-hidden="true"></span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ══ AUTH MODAL ══ -->
+  <div id="auth-overlay" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="auth-title">
+    <div class="modal-box auth-box">
+      <div class="auth-logo-row">
+        <span class="logo-icon">⚡</span>
+        <span class="logo-text">NeonSpin</span>
+      </div>
+      <h2 class="auth-title" id="auth-title">Sign In to Play</h2>
+      <p class="auth-subtitle">Earn rewards, level up &amp; climb the leaderboard</p>
+      <button id="btn-google-signin" class="btn-google" aria-label="Sign in with Google">
+        <svg class="google-icon" width="20" height="20" viewBox="0 0 18 18" aria-hidden="true">
+          <path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z"/>
+          <path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.258c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 009 18z"/>
+          <path fill="#FBBC05" d="M3.964 10.707A5.41 5.41 0 013.682 9c0-.593.102-1.17.282-1.707V4.961H.957A8.996 8.996 0 000 9c0 1.452.348 2.827.957 4.039l3.007-2.332z"/>
+          <path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 00.957 4.96l3.007 2.332C4.672 5.163 6.656 3.58 9 3.58z"/>
+        </svg>
+        <span id="signin-btn-text">Continue with Google</span>
+      </button>
+      <div id="auth-loading" class="auth-loading-row hidden">
+        <div class="auth-spinner"></div>
+        <p>Opening sign-in…</p>
+      </div>
+      <div id="auth-error-msg" class="auth-error hidden" role="alert"></div>
+      <div class="referral-row">
+        <input type="text" id="referral-input" class="neon-input"
+          placeholder="Referral code (optional)" maxlength="8"
+          autocomplete="off" spellcheck="false" aria-label="Referral code" />
+      </div>
+      <p class="auth-bonus-note">🎁 New accounts get 20–100 bonus EXP on first login!</p>
+      <p class="auth-legal">
+        By signing in you accept our
+        <button class="link-btn" id="btn-reopen-terms">Terms &amp; Conditions</button>
+      </p>
+      <button id="btn-guest-play" class="btn-ghost">Continue as Guest (limited features)</button>
+    </div>
+  </div>
+
+  <!-- ══ POPUP OVERLAY ══ -->
+  <div id="popup-overlay" class="popup-overlay hidden" role="alertdialog" aria-modal="true" aria-live="assertive">
+    <div id="popup-box" class="popup-box">
+      <div id="popup-icon" class="popup-icon"></div>
+      <h2 id="popup-title" class="popup-title"></h2>
+      <p id="popup-msg" class="popup-msg"></p>
+      <button id="popup-close" class="btn-primary btn-spin">
+        <span class="btn-text">Awesome!</span>
+        <span class="btn-ripple" aria-hidden="true"></span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ══ LEVEL-UP OVERLAY ══ -->
+  <div id="levelup-overlay" class="popup-overlay hidden" role="alertdialog" aria-modal="true" aria-live="assertive">
+    <div id="levelup-box" class="popup-box levelup-box">
+      <div id="confetti-container" aria-hidden="true"></div>
+      <div class="levelup-fire">🔥</div>
+      <h1 class="levelup-title">LEVEL UP!</h1>
+      <p class="levelup-subtitle">You reached <span id="levelup-num" class="levelup-num"></span></p>
+      <button id="levelup-close" class="btn-primary btn-glow">
+        <span class="btn-text">Let's Go! 🚀</span>
+        <span class="btn-ripple" aria-hidden="true"></span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ══ SITE HEADER ══ -->
+  <header id="site-header">
+    <div class="header-inner">
+      <div class="logo">
+        <span class="logo-icon">⚡</span>
+        <span class="logo-text">NeonSpin</span>
+      </div>
+      <div class="header-right">
+        <button id="btn-sound-toggle" class="icon-btn" title="Toggle sound" aria-label="Toggle sound">
+          <span id="sound-icon">🔊</span>
+        </button>
+        <button id="btn-theme-toggle" class="icon-btn" title="Toggle theme" aria-label="Toggle theme">
+          <span id="theme-icon">🌙</span>
+        </button>
+        <button id="user-avatar-btn" class="user-avatar hidden" aria-label="Profile / Sign out">
+          <span id="user-avatar-text">?</span>
+        </button>
+        <button id="btn-header-signin" class="btn-sm btn-signin-header" aria-label="Sign in">Sign In</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ══ MAIN APP ══ -->
+  <main id="app">
+    <section id="tab-home" class="tab-section active" aria-label="Home">
+
+      <!-- Player Stats -->
+      <section id="stats-section" aria-label="Player Stats">
+        <div class="stats-grid">
+          <div class="stat-card" id="card-coins">
+            <div class="stat-icon">💰</div>
+            <div class="stat-info">
+              <div class="stat-label">Coins</div>
+              <div class="stat-value" id="stat-coins">0</div>
+            </div>
+            <div class="stat-glow"></div>
+          </div>
+          <div class="stat-card" id="card-exp">
+            <div class="stat-icon">⭐</div>
+            <div class="stat-info">
+              <div class="stat-label">EXP</div>
+              <div class="stat-value" id="stat-exp">0</div>
+            </div>
+            <div class="stat-glow"></div>
+          </div>
+          <div class="stat-card" id="card-level">
+            <div class="stat-icon">🔥</div>
+            <div class="stat-info">
+              <div class="stat-label">Level</div>
+              <div class="stat-value" id="stat-level">1</div>
+            </div>
+            <div class="stat-glow"></div>
+          </div>
+        </div>
+
+        <div class="exp-bar-wrapper" aria-label="EXP Progress">
+          <div class="exp-bar-header">
+            <span class="exp-bar-label">Progress to next level</span>
+            <span class="exp-bar-pct" id="exp-pct">0 / 100 EXP</span>
+          </div>
+          <div class="exp-bar-track" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+            <div class="exp-bar-fill" id="exp-bar-fill" style="width:0%"></div>
+            <div class="exp-bar-shine" aria-hidden="true"></div>
+          </div>
+        </div>
+
+        <div class="chips-row">
+          <div class="streak-chip" id="streak-chip" title="Login streak bonus">
+            🔥 <span id="streak-count">0</span>-Day Streak
+            <span class="streak-bonus-tag">+Bonus EXP</span>
+          </div>
+          <button class="referral-chip" id="referral-chip" title="Tap to copy referral code" aria-label="Copy referral code">
+            🔗 Ref: <span id="referral-code-display">—</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- Spin Wheel -->
+      <section id="spin-section" aria-label="Spin the Wheel">
+        <h2 class="section-title"><span class="title-accent">Spin</span> the Wheel</h2>
+        <div class="wheel-wrapper">
+          <div class="wheel-pointer" aria-hidden="true">▼</div>
+          <div class="wheel-ring" aria-hidden="true">
+            <canvas id="spin-canvas" width="300" height="300" aria-label="Spin wheel"></canvas>
+          </div>
+          <div class="wheel-hub" aria-hidden="true">
+            <span class="hub-icon">⚡</span>
+          </div>
+        </div>
+        <div class="spin-meta">
+          <span class="spin-count-label">Free Spins:</span>
+          <span class="spin-badge" id="spin-count">3</span>
+        </div>
+        <button class="btn-primary btn-spin" id="btn-spin" aria-label="Spin the wheel">
+          <span class="btn-icon">🎰</span>
+          <span class="btn-text">SPIN NOW</span>
+          <span class="btn-ripple" aria-hidden="true"></span>
+        </button>
+      </section>
+
+      <!-- Daily Reward -->
+      <section id="daily-section" aria-label="Daily Reward">
+        <h2 class="section-title"><span class="title-accent">Daily</span> Reward</h2>
+        <div class="daily-card">
+          <div class="daily-icon-wrap" aria-hidden="true">
+            <div class="daily-icon">🎁</div>
+            <div class="daily-pulse"></div>
+          </div>
+          <div class="daily-info">
+            <p class="daily-desc">Come back every day to claim your bonus!</p>
+            <div class="daily-timer-row">
+              <span class="timer-label">Next reward in:</span>
+              <span class="timer-value" id="daily-timer">Ready!</span>
+            </div>
+          </div>
+          <button class="btn-primary btn-daily" id="btn-daily" aria-label="Claim daily reward">
+            <span class="btn-icon">✨</span>
+            <span class="btn-text">Claim</span>
+            <span class="btn-ripple" aria-hidden="true"></span>
+          </button>
+        </div>
+      </section>
+
+      <!-- Daily Tasks -->
+      <section id="tasks-section" aria-label="Daily Tasks">
+        <h2 class="section-title"><span class="title-accent">Daily</span> Tasks</h2>
+        <div class="tasks-list" id="tasks-list"></div>
+      </section>
+
+      <!-- Live Activity Feed -->
+      <section id="feed-section" aria-label="Live Activity Feed">
+        <h2 class="section-title">
+          <span class="title-accent">Live</span> Activity
+          <span class="live-dot" aria-label="live" title="Live feed"></span>
+        </h2>
+        <div class="feed-wrapper" id="activity-feed" aria-live="polite"></div>
+      </section>
+
+      <div class="ad-placeholder" aria-label="Advertisement area">
+        <span class="ad-tag">Ad</span>
+        <p>Advertisement — AdSense compatible slot</p>
+      </div>
+
+      <!-- Feedback -->
+      <section id="feedback-section" aria-label="Community Feedback">
+        <h2 class="section-title"><span class="title-accent">Community</span> Feedback</h2>
+        <div class="feedback-form-card">
+          <textarea id="feedback-message" class="neon-input neon-textarea"
+            placeholder="Share your experience or suggestion…"
+            rows="3" maxlength="300" aria-label="Feedback message"></textarea>
+          <input type="file" id="feedback-image" accept="image/*" class="hidden-file-input" aria-label="Attach screenshot" />
+          <label for="feedback-image" class="neon-file-label">
+            📷 Attach Screenshot
+            <span class="file-name-display" id="file-name-display">(optional)</span>
+          </label>
+          <img id="feedback-preview" class="feedback-preview hidden" alt="Preview" />
+          <button id="btn-submit-feedback" class="btn-primary btn-daily" style="width:100%;margin-top:8px">
+            <span class="btn-icon">📤</span>
+            <span class="btn-text">Submit Feedback</span>
+            <span class="btn-ripple" aria-hidden="true"></span>
+          </button>
+        </div>
+        <div id="feedback-list" class="feedback-list"></div>
+      </section>
+
+      <div class="contact-bar">
+        <a href="mailto:neonspin.support@gmail.com" class="btn-contact" aria-label="Contact support">
+          <span>📧</span> Contact Support
+        </a>
+      </div>
+
+    </section>
+  </main>
+
+  <!-- ══ BOTTOM NAV ══ -->
+  <nav id="bottom-nav" aria-label="Main navigation">
+    <a href="index.html" class="nav-btn active" aria-label="Home" aria-selected="true">
+      <span class="nav-icon">🏠</span>
+      <span class="nav-label">Home</span>
+      <span class="nav-indicator" aria-hidden="true"></span>
+    </a>
+    <a href="games.html" class="nav-btn" aria-label="Games" aria-selected="false">
+      <span class="nav-icon">🎮</span>
+      <span class="nav-label">Games</span>
+      <span class="nav-indicator" aria-hidden="true"></span>
+    </a>
+    <a href="leaderboard.html" class="nav-btn" aria-label="Leaderboard" aria-selected="false">
+      <span class="nav-icon">🏆</span>
+      <span class="nav-label">Ranks</span>
+      <span class="nav-indicator" aria-hidden="true"></span>
+    </a>
+    <a href="redeem.html" class="nav-btn" aria-label="Rewards" aria-selected="false">
+      <span class="nav-icon">🎁</span>
+      <span class="nav-label">Rewards</span>
+      <span class="nav-indicator" aria-hidden="true"></span>
+    </a>
+    <a href="profile.html" class="nav-btn" aria-label="Profile" aria-selected="false">
+      <span class="nav-icon">👤</span>
+      <span class="nav-label">Profile</span>
+      <span class="nav-indicator" aria-hidden="true"></span>
+    </a>
+  </nav>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>

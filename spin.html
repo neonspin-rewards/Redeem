@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+  <title>NeonSpin — Spin Wheel</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="style.css"/>
+  <style>
+    .game-page-wrap { padding: 20px 16px 100px; max-width: 480px; margin: 0 auto; }
+    .back-link { display:inline-flex;align-items:center;gap:6px;color:var(--clr-muted);font-size:13px;font-weight:600;text-decoration:none;margin-bottom:20px;padding:8px 12px;background:rgba(255,255,255,.05);border-radius:20px;border:1px solid rgba(255,255,255,.08);transition:all .2s; }
+    .back-link:hover { color:var(--clr-accent);border-color:rgba(0,212,255,.3);text-decoration:none; }
+    .game-title-row { text-align:center;margin-bottom:24px; }
+    .game-title-row h1 { font-family:var(--font-display);font-size:22px;font-weight:900;background:linear-gradient(135deg,#00d4ff,#a855f7);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text; }
+    .game-title-row p { color:var(--clr-muted);font-size:13px;margin-top:4px; }
+    /* Wheel */
+    .wheel-container { display:flex;flex-direction:column;align-items:center;gap:20px; }
+    .wheel-wrap { position:relative;width:min(300px,85vw);height:min(300px,85vw); }
+    .wheel-pointer-top { position:absolute;top:-14px;left:50%;transform:translateX(-50%);font-size:24px;z-index:10;filter:drop-shadow(0 0 8px #fbbf24); }
+    canvas#spin-canvas { border-radius:50%;box-shadow:0 0 40px rgba(0,212,255,.3),0 0 80px rgba(168,85,247,.15);display:block; }
+    .wheel-center-dot { position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:20px;height:20px;border-radius:50%;background:var(--clr-bg);border:3px solid #fff;z-index:10; }
+    .spin-btn { padding:14px 48px;font-family:var(--font-display);font-size:16px;font-weight:900;letter-spacing:.08em;border:none;border-radius:32px;background:linear-gradient(135deg,#00d4ff,#a855f7);color:#fff;cursor:pointer;box-shadow:0 0 30px rgba(0,212,255,.4);transition:transform .15s,opacity .15s;touch-action:manipulation; }
+    .spin-btn:hover:not(:disabled) { transform:scale(1.05); }
+    .spin-btn:disabled { opacity:.5;cursor:not-allowed;transform:none; }
+    .reward-card { background:var(--clr-card);border:1px solid var(--clr-border);border-radius:var(--r-lg);padding:28px 20px;text-align:center;animation:popIn .35s cubic-bezier(.34,1.56,.64,1); }
+    .reward-emoji { font-size:52px;margin-bottom:12px;display:block; }
+    .reward-amount { font-family:var(--font-display);font-size:40px;font-weight:900;color:var(--clr-gold); }
+    .reward-label { font-size:15px;color:var(--clr-muted);margin:4px 0 20px; }
+    .reward-unlock-note { font-size:12px;color:var(--clr-green);margin-bottom:16px; }
+    .hidden { display:none!important; }
+    .btn-primary { display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:14px 28px;border-radius:24px;font-family:var(--font-display);font-size:14px;font-weight:700;letter-spacing:.06em;border:none;background:linear-gradient(135deg,var(--clr-accent),var(--clr-accent2));color:#fff;cursor:pointer;transition:opacity .15s,transform .15s;width:100%; }
+    .btn-primary:hover { opacity:.9;transform:translateY(-1px); }
+    @keyframes popIn { from{opacity:0;transform:scale(.85)} to{opacity:1;transform:scale(1)} }
+  </style>
+</head>
+<body>
+  <header id="site-header">
+    <div class="header-inner">
+      <div class="logo"><span class="logo-icon">⚡</span><span class="logo-text">NeonSpin</span></div>
+      <div class="header-right" style="font-size:13px;color:var(--clr-muted)">Game 1 of 8</div>
+    </div>
+  </header>
+
+  <main id="app">
+    <div class="game-page-wrap">
+      <a href="games.html" class="back-link">← Back to Games</a>
+
+      <div class="game-title-row">
+        <h1>🎡 Spin Wheel</h1>
+        <p>Spin to win up to 500 coins!</p>
+      </div>
+
+      <div class="wheel-container">
+        <div class="wheel-wrap">
+          <div class="wheel-pointer-top">▼</div>
+          <canvas id="spin-canvas" width="300" height="300"></canvas>
+          <div class="wheel-center-dot"></div>
+        </div>
+
+        <button id="spin-btn" class="spin-btn">⚡ SPIN</button>
+
+        <div id="reward-card" class="reward-card hidden">
+          <span class="reward-emoji" id="reward-emoji">🎉</span>
+          <div class="reward-amount" id="reward-amount">+50</div>
+          <div class="reward-label">Coins Earned!</div>
+          <div class="reward-unlock-note" id="unlock-note"></div>
+          <button class="btn-primary" id="spin-again-btn">🔄 Spin Again</button>
+          <a href="games.html" style="display:block;text-align:center;margin-top:12px;color:var(--clr-muted);font-size:13px;">← Back to Hub</a>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <nav id="bottom-nav" aria-label="Main navigation">
+    <a href="index.html" class="nav-btn"><span class="nav-icon">🏠</span><span class="nav-label">Home</span><span class="nav-indicator"></span></a>
+    <a href="games.html" class="nav-btn active"><span class="nav-icon">🎮</span><span class="nav-label">Games</span><span class="nav-indicator"></span></a>
+    <a href="leaderboard.html" class="nav-btn"><span class="nav-icon">🏆</span><span class="nav-label">Ranks</span><span class="nav-indicator"></span></a>
+    <a href="redeem.html" class="nav-btn"><span class="nav-icon">🎁</span><span class="nav-label">Rewards</span><span class="nav-indicator"></span></a>
+    <a href="profile.html" class="nav-btn"><span class="nav-icon">👤</span><span class="nav-label">Profile</span><span class="nav-indicator"></span></a>
+  </nav>
+
+  <script>
+  (() => {
+    const GAME_ID = 1;
+    const LS_KEY = 'ns_unlocked_games';
+    const SEGMENTS = [
+      { label:'10',  coins:10,  color:'#0d1120' },
+      { label:'25',  coins:25,  color:'#121827' },
+      { label:'50',  coins:50,  color:'#0d1120' },
+      { label:'75',  coins:75,  color:'#121827' },
+      { label:'100', coins:100, color:'#0d1120' },
+      { label:'150', coins:150, color:'#121827' },
+      { label:'200', coins:200, color:'#0d1120' },
+      { label:'500', coins:500, color:'#121827', rare:true },
+    ];
+    const COLORS = ['#00d4ff','#a855f7','#fbbf24','#39ff14','#ff6b35','#ff4488','#00ffaa','#ffdd00'];
+    const N = SEGMENTS.length;
+    const ARC = (2 * Math.PI) / N;
+
+    let spinning = false;
+    let currentAngle = 0;
+
+    const canvas = document.getElementById('spin-canvas');
+    const ctx = canvas.getContext('2d');
+    const W = canvas.width;
+    const R = W / 2 - 4;
+    const cx = W / 2, cy = W / 2;
+
+    function drawWheel(angle) {
+      ctx.clearRect(0, 0, W, W);
+      for (let i = 0; i < N; i++) {
+        const start = angle + i * ARC;
+        const end   = start + ARC;
+        // Segment
+        ctx.beginPath();
+        ctx.moveTo(cx, cy);
+        ctx.arc(cx, cy, R, start, end);
+        ctx.closePath();
+        ctx.fillStyle = COLORS[i];
+        ctx.fill();
+        ctx.strokeStyle = 'rgba(255,255,255,.12)';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+        // Text
+        ctx.save();
+        ctx.translate(cx, cy);
+        ctx.rotate(start + ARC / 2);
+        ctx.textAlign = 'right';
+        ctx.fillStyle = '#fff';
+        ctx.font = `bold ${SEGMENTS[i].rare ? 16 : 14}px Orbitron, monospace`;
+        ctx.shadowColor = SEGMENTS[i].rare ? '#fbbf24' : 'rgba(0,0,0,.5)';
+        ctx.shadowBlur = SEGMENTS[i].rare ? 10 : 4;
+        ctx.fillText(SEGMENTS[i].label, R - 10, 5);
+        ctx.restore();
+      }
+      // Center circle
+      ctx.beginPath();
+      ctx.arc(cx, cy, 18, 0, 2 * Math.PI);
+      ctx.fillStyle = '#080b14';
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(255,255,255,.3)';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+    }
+
+    drawWheel(currentAngle);
+
+    document.getElementById('spin-btn').addEventListener('click', doSpin);
+
+    function doSpin() {
+      if (spinning) return;
+      spinning = true;
+      document.getElementById('spin-btn').disabled = true;
+      document.getElementById('reward-card').classList.add('hidden');
+
+      // Pick random segment (weighted: rare = 5% chance)
+      let idx;
+      const r = Math.random();
+      if (r < 0.05) {
+        idx = 7; // rare 500
+      } else {
+        idx = Math.floor(Math.random() * (N - 1));
+      }
+
+      const totalSpins  = 5 + Math.floor(Math.random() * 3); // 5–7 full rotations
+      const targetAngle = currentAngle + totalSpins * 2 * Math.PI + (2 * Math.PI - idx * ARC - ARC / 2);
+      const duration    = 3500;
+      const start       = performance.now();
+      const fromAngle   = currentAngle;
+
+      function easeOut(t) { return 1 - Math.pow(1 - t, 4); }
+
+      function frame(now) {
+        const elapsed = now - start;
+        const t = Math.min(elapsed / duration, 1);
+        currentAngle = fromAngle + (targetAngle - fromAngle) * easeOut(t);
+        drawWheel(currentAngle);
+        if (t < 1) {
+          requestAnimationFrame(frame);
+        } else {
+          currentAngle = targetAngle % (2 * Math.PI);
+          spinning = false;
+          showReward(idx);
+        }
+      }
+      requestAnimationFrame(frame);
+    }
+
+    function showReward(idx) {
+      const seg = SEGMENTS[idx];
+      document.getElementById('reward-emoji').textContent = seg.rare ? '🏆' : '🎉';
+      document.getElementById('reward-amount').textContent = '+' + seg.coins;
+
+      // Unlock next game
+      const current = parseInt(localStorage.getItem(LS_KEY) || '2', 10);
+      const noteEl  = document.getElementById('unlock-note');
+      if (GAME_ID >= current) {
+        const newCount = Math.min(8, GAME_ID + 1);
+        localStorage.setItem(LS_KEY, String(newCount));
+        noteEl.textContent = '🔓 Scratch Card unlocked!';
+      } else {
+        noteEl.textContent = '';
+      }
+
+      document.getElementById('reward-card').classList.remove('hidden');
+      document.getElementById('spin-btn').disabled = false;
+    }
+
+    document.getElementById('spin-again-btn').addEventListener('click', () => {
+      document.getElementById('reward-card').classList.add('hidden');
+    });
+
+    // Load theme
+    if (localStorage.getItem('ns_theme') === 'light') document.body.classList.add('light-theme');
+  })();
+  </script>
+</body>
+</html>

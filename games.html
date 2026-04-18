@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="description" content="NeonSpin — Play mini games to earn coins and EXP." />
+  <meta name="theme-color" content="#080b14" />
+  <title>NeonSpin — Games</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <div id="particles-bg" aria-hidden="true"></div>
+
+  <!-- ══ LOADING SCREEN ══ -->
+  <div id="loading-screen" style="display:none">
+    <div class="loading-inner">
+      <div class="loading-logo">
+        <span class="logo-icon">⚡</span>
+        <span class="logo-text">NeonSpin</span>
+      </div>
+      <div class="loading-spinner" aria-label="Loading…"></div>
+      <p class="loading-text" id="loading-status">Initialising…</p>
+    </div>
+  </div>
+
+  <!-- ══ TERMS MODAL ══ -->
+  <div id="terms-overlay" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="terms-title">
+    <div class="modal-box terms-box">
+      <div class="modal-hero-icon">📜</div>
+      <h2 class="modal-title" id="terms-title">Before You Play</h2>
+      <div class="terms-scroll">
+        <p class="terms-intro">Welcome to <strong>NeonSpin</strong>. A fun, relaxing reward experience — enjoy it at your own pace.</p>
+        <p>Rewards appear based on luck and basic conditions. They aren't fixed or guaranteed — that's what keeps things exciting!</p>
+        <p>Coins and EXP are in-platform only and carry <strong>no real-world monetary value</strong>.</p>
+        <p>Your account is secured via Firebase Authentication. Your data is never sold or shared.</p>
+        <p>Any misuse (bots, exploits) may result in a permanent ban to keep things fair for everyone.</p>
+        <p class="terms-contact">Questions? Email us: <a href="mailto:support@neonspin.app">support@neonspin.app</a></p>
+      </div>
+      <button id="btn-accept-terms" class="btn-primary btn-glow">
+        <span class="btn-icon">✅</span>
+        <span class="btn-text">I Understand — Continue</span>
+        <span class="btn-ripple" aria-hidden="true"></span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ══ AUTH MODAL ══ -->
+  <div id="auth-overlay" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="auth-title">
+    <div class="modal-box auth-box">
+      <div class="auth-logo-row">
+        <span class="logo-icon">⚡</span>
+        <span class="logo-text">NeonSpin</span>
+      </div>
+      <h2 class="auth-title" id="auth-title">Sign In to Play</h2>
+      <p class="auth-subtitle">Earn rewards, level up &amp; climb the leaderboard</p>
+      <button id="btn-google-signin" class="btn-google" aria-label="Sign in with Google">
+        <svg class="google-icon" width="20" height="20" viewBox="0 0 18 18" aria-hidden="true">
+          <path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z"/>
+          <path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.258c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 009 18z"/>
+          <path fill="#FBBC05" d="M3.964 10.707A5.41 5.41 0 013.682 9c0-.593.102-1.17.282-1.707V4.961H.957A8.996 8.996 0 000 9c0 1.452.348 2.827.957 4.039l3.007-2.332z"/>
+          <path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 00.957 4.96l3.007 2.332C4.672 5.163 6.656 3.58 9 3.58z"/>
+        </svg>
+        <span id="signin-btn-text">Continue with Google</span>
+      </button>
+      <div id="auth-loading" class="auth-loading-row hidden">
+        <div class="auth-spinner"></div>
+        <p>Opening sign-in…</p>
+      </div>
+      <div id="auth-error-msg" class="auth-error hidden" role="alert"></div>
+      <div class="referral-row">
+        <input type="text" id="referral-input" class="neon-input"
+          placeholder="Referral code (optional)" maxlength="8"
+          autocomplete="off" spellcheck="false" aria-label="Referral code" />
+      </div>
+      <p class="auth-bonus-note">🎁 New accounts get 20–100 bonus EXP on first login!</p>
+      <p class="auth-legal">
+        By signing in you accept our
+        <button class="link-btn" id="btn-reopen-terms">Terms &amp; Conditions</button>
+      </p>
+      <button id="btn-guest-play" class="btn-ghost">Continue as Guest (limited features)</button>
+    </div>
+  </div>
+
+  <!-- ══ POPUP OVERLAY ══ -->
+  <div id="popup-overlay" class="popup-overlay hidden" role="alertdialog" aria-modal="true" aria-live="assertive">
+    <div id="popup-box" class="popup-box">
+      <div id="popup-icon" class="popup-icon"></div>
+      <h2 id="popup-title" class="popup-title"></h2>
+      <p id="popup-msg" class="popup-msg"></p>
+      <button id="popup-close" class="btn-primary btn-spin">
+        <span class="btn-text">Awesome!</span>
+        <span class="btn-ripple" aria-hidden="true"></span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ══ LEVEL-UP OVERLAY ══ -->
+  <div id="levelup-overlay" class="popup-overlay hidden" role="alertdialog" aria-modal="true" aria-live="assertive">
+    <div id="levelup-box" class="popup-box levelup-box">
+      <div id="confetti-container" aria-hidden="true"></div>
+      <div class="levelup-fire">🔥</div>
+      <h1 class="levelup-title">LEVEL UP!</h1>
+      <p class="levelup-subtitle">You reached <span id="levelup-num" class="levelup-num"></span></p>
+      <button id="levelup-close" class="btn-primary btn-glow">
+        <span class="btn-text">Let's Go! 🚀</span>
+        <span class="btn-ripple" aria-hidden="true"></span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ══ SITE HEADER ══ -->
+  <header id="site-header">
+    <div class="header-inner">
+      <div class="logo">
+        <span class="logo-icon">⚡</span>
+        <span class="logo-text">NeonSpin</span>
+      </div>
+      <div class="header-right">
+        <button id="btn-sound-toggle" class="icon-btn" title="Toggle sound" aria-label="Toggle sound">
+          <span id="sound-icon">🔊</span>
+        </button>
+        <button id="btn-theme-toggle" class="icon-btn" title="Toggle theme" aria-label="Toggle theme">
+          <span id="theme-icon">🌙</span>
+        </button>
+        <button id="user-avatar-btn" class="user-avatar hidden" aria-label="Profile / Sign out">
+          <span id="user-avatar-text">?</span>
+        </button>
+        <button id="btn-header-signin" class="btn-sm btn-signin-header" aria-label="Sign in">Sign In</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ══ MAIN CONTENT — GAMES HUB ══ -->
+  <main id="app">
+    <section id="tab-games" class="tab-section active" aria-label="Mini Games">
+
+      <div class="games-hub-header">
+        <h2 class="section-title"><span class="title-accent">Mini</span> Games</h2>
+        <p class="games-intro">Complete games to unlock the next. All 8 games await!</p>
+      </div>
+
+      <!-- Unlock Progress -->
+      <div class="hub-progress-card" aria-label="Unlock progress">
+        <div class="hub-progress-top">
+          <span class="hub-progress-label">🔓 Unlocked</span>
+          <span class="hub-progress-count"><span id="unlock-count">2</span> / 8</span>
+        </div>
+        <div class="hub-progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="8">
+          <div class="hub-progress-fill" id="unlock-fill" style="width:25%"></div>
+        </div>
+        <p class="hub-progress-hint" id="hub-progress-hint">Play games to unlock the full collection!</p>
+      </div>
+
+      <!-- Game Cards Grid -->
+      <div class="games-grid" id="games-grid" aria-label="Game selection">
+        <!-- Cards injected by manager.js -->
+        <div class="ghc-skeleton"></div>
+        <div class="ghc-skeleton"></div>
+        <div class="ghc-skeleton"></div>
+        <div class="ghc-skeleton"></div>
+        <div class="ghc-skeleton"></div>
+        <div class="ghc-skeleton"></div>
+        <div class="ghc-skeleton"></div>
+        <div class="ghc-skeleton"></div>
+      </div>
+
+    </section>
+  </main>
+
+  <!-- ══ BOTTOM NAV ══ -->
+  <nav id="bottom-nav" aria-label="Main navigation">
+    <a href="index.html" class="nav-btn" aria-label="Home" aria-selected="false">
+      <span class="nav-icon">🏠</span>
+      <span class="nav-label">Home</span>
+      <span class="nav-indicator" aria-hidden="true"></span>
+    </a>
+    <a href="games.html" class="nav-btn active" aria-label="Games" aria-selected="true">
+      <span class="nav-icon">🎮</span>
+      <span class="nav-label">Games</span>
+      <span class="nav-indicator" aria-hidden="true"></span>
+    </a>
+    <a href="leaderboard.html" class="nav-btn" aria-label="Leaderboard" aria-selected="false">
+      <span class="nav-icon">🏆</span>
+      <span class="nav-label">Ranks</span>
+      <span class="nav-indicator" aria-hidden="true"></span>
+    </a>
+    <a href="redeem.html" class="nav-btn" aria-label="Rewards" aria-selected="false">
+      <span class="nav-icon">🎁</span>
+      <span class="nav-label">Rewards</span>
+      <span class="nav-indicator" aria-hidden="true"></span>
+    </a>
+    <a href="profile.html" class="nav-btn" aria-label="Profile" aria-selected="false">
+      <span class="nav-icon">👤</span>
+      <span class="nav-label">Profile</span>
+      <span class="nav-indicator" aria-hidden="true"></span>
+    </a>
+  </nav>
+
+  <script type="module" src="app-games.js"></script>
+</body>
+</html>

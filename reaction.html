@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+  <title>NeonSpin — Reaction Game</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="style.css"/>
+  <style>
+    .game-page-wrap{padding:20px 16px 100px;max-width:480px;margin:0 auto}
+    .back-link{display:inline-flex;align-items:center;gap:6px;color:var(--clr-muted);font-size:13px;font-weight:600;text-decoration:none;margin-bottom:20px;padding:8px 12px;background:rgba(255,255,255,.05);border-radius:20px;border:1px solid rgba(255,255,255,.08);transition:all .2s}
+    .back-link:hover{color:var(--clr-accent);border-color:rgba(0,212,255,.3);text-decoration:none}
+    .game-title-row{text-align:center;margin-bottom:24px}
+    .game-title-row h1{font-family:var(--font-display);font-size:22px;font-weight:900;background:linear-gradient(135deg,#ffdd00,#ff6b35);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+    .game-title-row p{color:var(--clr-muted);font-size:13px;margin-top:4px}
+    .reaction-card{background:var(--clr-card);border:1px solid rgba(255,221,0,.2);border-radius:var(--r-lg);padding:24px 20px;box-shadow:0 0 30px rgba(255,221,0,.06)}
+    .rxn-stats{display:flex;justify-content:center;gap:28px;margin-bottom:24px}
+    .rxn-stat{text-align:center}
+    .rs-label{font-size:10px;color:var(--clr-muted);text-transform:uppercase;letter-spacing:.06em;font-weight:600;display:block}
+    .rs-val{font-family:var(--font-display);font-size:22px;font-weight:900;color:var(--clr-accent);display:block}
+    /* The big reaction pad */
+    .rxn-pad{width:100%;aspect-ratio:1;max-height:280px;border-radius:var(--r-xl);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;cursor:pointer;user-select:none;touch-action:manipulation;transition:background .25s,box-shadow .25s;margin-bottom:20px;position:relative;overflow:hidden}
+    .rxn-pad.state-idle{background:rgba(255,255,255,.05);border:2px solid rgba(255,255,255,.1)}
+    .rxn-pad.state-wait{background:rgba(255,68,68,.2);border:2px solid rgba(255,68,68,.5);box-shadow:0 0 40px rgba(255,68,68,.3)}
+    .rxn-pad.state-go{background:rgba(57,255,20,.2);border:2px solid rgba(57,255,20,.6);box-shadow:0 0 60px rgba(57,255,20,.5);animation:goPulse .25s ease infinite alternate}
+    .rxn-pad.state-early{background:rgba(255,165,0,.2);border:2px solid rgba(255,165,0,.6)}
+    .rxn-pad.state-done{background:rgba(0,212,255,.1);border:2px solid rgba(0,212,255,.3)}
+    .rxn-emoji{font-size:56px;pointer-events:none;transition:transform .2s}
+    .rxn-label{font-family:var(--font-display);font-size:16px;font-weight:900;pointer-events:none;text-align:center;padding:0 20px;line-height:1.3}
+    .rxn-sublabel{font-size:13px;color:var(--clr-muted);pointer-events:none;text-align:center}
+    .rxn-history{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;min-height:28px;margin-bottom:4px}
+    .rxn-bubble{font-size:12px;font-weight:700;font-family:var(--font-display);padding:4px 10px;border-radius:20px;background:rgba(0,212,255,.12);border:1px solid rgba(0,212,255,.25);color:var(--clr-accent)}
+    .rxn-bubble.fast{background:rgba(57,255,20,.12);border-color:rgba(57,255,20,.3);color:#39ff14}
+    .rxn-bubble.slow{background:rgba(255,68,68,.1);border-color:rgba(255,68,68,.25);color:#ff8888}
+    .result-panel{text-align:center;padding:16px;animation:popIn .35s cubic-bezier(.34,1.56,.64,1)}
+    .result-big{font-family:var(--font-display);font-size:44px;font-weight:900;color:var(--clr-gold)}
+    .result-sub{font-size:14px;color:var(--clr-muted);margin:4px 0 6px}
+    .result-avg{font-size:15px;font-weight:600;color:var(--clr-accent);margin-bottom:8px}
+    .result-unlock{font-size:12px;color:var(--clr-green);margin-bottom:16px}
+    .btn-primary{display:flex;align-items:center;justify-content:center;gap:8px;padding:14px 28px;border-radius:24px;font-family:var(--font-display);font-size:14px;font-weight:700;letter-spacing:.06em;border:none;background:linear-gradient(135deg,var(--clr-accent),var(--clr-accent2));color:#fff;cursor:pointer;transition:opacity .15s,transform .15s;width:100%}
+    .btn-primary:hover{opacity:.9;transform:translateY(-1px)}
+    .hidden{display:none!important}
+    @keyframes goPulse{from{box-shadow:0 0 40px rgba(57,255,20,.4)}to{box-shadow:0 0 80px rgba(57,255,20,.8)}}
+    @keyframes popIn{from{opacity:0;transform:scale(.85)}to{opacity:1;transform:scale(1)}}
+  </style>
+</head>
+<body>
+  <header id="site-header">
+    <div class="header-inner">
+      <div class="logo"><span class="logo-icon">⚡</span><span class="logo-text">NeonSpin</span></div>
+      <div class="header-right" style="font-size:13px;color:var(--clr-muted)">Game 8 of 8</div>
+    </div>
+  </header>
+
+  <main id="app">
+    <div class="game-page-wrap">
+      <a href="games.html" class="back-link">← Back to Games</a>
+      <div class="game-title-row">
+        <h1>⚡ Reaction Game</h1>
+        <p>Wait for green — then tap as fast as you can!</p>
+      </div>
+
+      <div class="reaction-card">
+        <div class="rxn-stats">
+          <div class="rxn-stat"><span class="rs-label">Round</span><span class="rs-val" id="rxn-round">0 / 5</span></div>
+          <div class="rxn-stat"><span class="rs-label">Best</span><span class="rs-val" id="rxn-best">— ms</span></div>
+          <div class="rxn-stat"><span class="rs-label">Avg</span><span class="rs-val" id="rxn-avg">— ms</span></div>
+        </div>
+
+        <div class="rxn-pad state-idle" id="rxn-pad">
+          <span class="rxn-emoji" id="rxn-emoji">⚡</span>
+          <span class="rxn-label" id="rxn-label">Tap to Start</span>
+          <span class="rxn-sublabel" id="rxn-sub">5 rounds • tap when GREEN</span>
+        </div>
+
+        <div class="rxn-history" id="rxn-history"></div>
+
+        <div id="result-panel" class="result-panel hidden">
+          <div style="font-size:48px;margin-bottom:12px" id="r-icon">⚡</div>
+          <div class="result-big" id="r-coins">+0</div>
+          <div class="result-sub">Coins Earned!</div>
+          <div class="result-avg" id="r-avg"></div>
+          <button class="btn-primary" id="retry-btn">🔄 Play Again</button>
+          <a href="games.html" style="display:block;text-align:center;margin-top:12px;color:var(--clr-muted);font-size:13px;">← Back to Hub</a>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <nav id="bottom-nav">
+    <a href="index.html" class="nav-btn"><span class="nav-icon">🏠</span><span class="nav-label">Home</span><span class="nav-indicator"></span></a>
+    <a href="games.html" class="nav-btn active"><span class="nav-icon">🎮</span><span class="nav-label">Games</span><span class="nav-indicator"></span></a>
+    <a href="leaderboard.html" class="nav-btn"><span class="nav-icon">🏆</span><span class="nav-label">Ranks</span><span class="nav-indicator"></span></a>
+    <a href="redeem.html" class="nav-btn"><span class="nav-icon">🎁</span><span class="nav-label">Rewards</span><span class="nav-indicator"></span></a>
+    <a href="profile.html" class="nav-btn"><span class="nav-icon">👤</span><span class="nav-label">Profile</span><span class="nav-indicator"></span></a>
+  </nav>
+
+  <script>
+  (() => {
+    const GAME_ID  = 8;
+    const LS_BEST  = 'ns_rxn_best';
+    const ROUNDS   = 5;
+
+    let state='idle', round=0, times=[], goTime=0, waitTimeout=null;
+    let best=parseInt(localStorage.getItem(LS_BEST)||'9999',10);
+
+    function setText(id,v){ const e=document.getElementById(id); if(e) e.textContent=String(v); }
+    setText('rxn-best', best===9999?'— ms':best+'ms');
+
+    const pad   = document.getElementById('rxn-pad');
+    const emoji = document.getElementById('rxn-emoji');
+    const label = document.getElementById('rxn-label');
+    const sub   = document.getElementById('rxn-sub');
+
+    function startSession(){
+      round=0; times=[];
+      document.getElementById('rxn-history').innerHTML='';
+      document.getElementById('result-panel').classList.add('hidden');
+      setText('rxn-round','0 / 5');
+      setText('rxn-avg','— ms');
+      nextRound();
+    }
+
+    function nextRound(){
+      round++;
+      setText('rxn-round',`${round} / ${ROUNDS}`);
+      setWait();
+    }
+
+    function setWait(){
+      state='wait';
+      pad.className='rxn-pad state-wait';
+      emoji.textContent='🔴';
+      label.textContent='Wait…';
+      sub.textContent='Don\'t tap yet!';
+
+      const delay = 1500 + Math.random() * 3000;
+      waitTimeout = setTimeout(setGo, delay);
+    }
+
+    function setGo(){
+      state='go';
+      goTime = performance.now();
+      pad.className='rxn-pad state-go';
+      emoji.textContent='🟢';
+      label.textContent='TAP NOW!';
+      sub.textContent='';
+    }
+
+    function onPadTap(){
+      if(state==='idle'){
+        startSession();
+        return;
+      }
+      if(state==='wait'){
+        // Too early
+        clearTimeout(waitTimeout);
+        state='early';
+        pad.className='rxn-pad state-early';
+        emoji.textContent='⚠️';
+        label.textContent='Too early!';
+        sub.textContent='Tap to try this round again';
+        return;
+      }
+      if(state==='early'){
+        setWait();
+        return;
+      }
+      if(state==='go'){
+        const ms = Math.round(performance.now() - goTime);
+        times.push(ms);
+        addBubble(ms);
+
+        if(ms < best){ best=ms; localStorage.setItem(LS_BEST,String(best)); setText('rxn-best',best+'ms'); }
+
+        const avg = Math.round(times.reduce((a,b)=>a+b,0)/times.length);
+        setText('rxn-avg', avg+'ms');
+
+        state='done';
+        pad.className='rxn-pad state-done';
+        emoji.textContent='✅';
+        label.textContent=ms+'ms';
+        sub.textContent=ms<250?'Lightning fast! ⚡':ms<400?'Great!':ms<600?'Good!':'Keep practicing!';
+
+        if(round>=ROUNDS){
+          setTimeout(endGame, 900);
+        } else {
+          setTimeout(nextRound, 700);
+        }
+        return;
+      }
+    }
+
+    function addBubble(ms){
+      const hist = document.getElementById('rxn-history');
+      const b = document.createElement('span');
+      b.className='rxn-bubble'+(ms<300?' fast':ms>600?' slow':'');
+      b.textContent=ms+'ms';
+      hist.appendChild(b);
+    }
+
+    function endGame(){
+      const avg=Math.round(times.reduce((a,b)=>a+b,0)/times.length);
+      const coins = avg<200?50 : avg<300?35 : avg<450?25 : avg<600?15 : 8;
+
+      document.getElementById('r-icon').textContent = avg<300?'⚡':'🎯';
+      setText('r-coins','+'+coins);
+      document.getElementById('r-avg').textContent=`Average: ${avg}ms`;
+
+      // ── HYBRID SYNC: award coins to localStorage + Firebase ──
+      window.__ns_giveReward?.('coins', coins, '⚡', 'Reaction!');
+
+      document.getElementById('result-panel').classList.remove('hidden');
+    }
+
+    pad.addEventListener('click', onPadTap);
+    pad.addEventListener('touchend', e=>{ e.preventDefault(); onPadTap(); },{passive:false});
+    document.getElementById('retry-btn').addEventListener('click',()=>{
+      document.getElementById('result-panel').classList.add('hidden');
+      pad.className='rxn-pad state-idle';
+      emoji.textContent='⚡';
+      label.textContent='Tap to Start';
+      sub.textContent='5 rounds • tap when GREEN';
+      state='idle';
+    });
+
+    if(localStorage.getItem('ns_theme')==='light') document.body.classList.add('light-theme');
+  })();
+  </script>
+  <script type="module" src="game-bridge.js"></script>
+</body>
+</html>

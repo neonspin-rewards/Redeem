@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+  <title>NeonSpin — 2048</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="style.css"/>
+  <style>
+    .game-page-wrap{padding:20px 16px 100px;max-width:480px;margin:0 auto}
+    .back-link{display:inline-flex;align-items:center;gap:6px;color:var(--clr-muted);font-size:13px;font-weight:600;text-decoration:none;margin-bottom:20px;padding:8px 12px;background:rgba(255,255,255,.05);border-radius:20px;border:1px solid rgba(255,255,255,.08);transition:all .2s}
+    .back-link:hover{color:var(--clr-accent);border-color:rgba(0,212,255,.3);text-decoration:none}
+    .game-title-row{text-align:center;margin-bottom:16px}
+    .game-title-row h1{font-family:var(--font-display);font-size:22px;font-weight:900;background:linear-gradient(135deg,#ff6b35,#fbbf24);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+    .game-title-row p{color:var(--clr-muted);font-size:13px;margin-top:4px}
+    .g2048-card{background:var(--clr-card);border:1px solid rgba(255,107,53,.2);border-radius:var(--r-lg);padding:16px;box-shadow:0 0 30px rgba(255,107,53,.08)}
+    .g2048-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;gap:8px}
+    .g2048-stats{display:flex;gap:16px}
+    .g2048-stat{text-align:center}
+    .gs-label{display:block;font-size:10px;color:var(--clr-muted);text-transform:uppercase;letter-spacing:.06em;font-weight:600}
+    .gs-val{display:block;font-family:var(--font-display);font-size:20px;font-weight:700;color:var(--clr-accent)}
+    .btn-sm{padding:7px 14px;border-radius:var(--r-sm);font-size:12px;font-weight:600;font-family:var(--font-body);background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.2);color:var(--clr-accent);cursor:pointer;transition:background .2s;flex-shrink:0}
+    .btn-sm:hover{background:rgba(0,212,255,.18)}
+    .swipe-hint{font-size:12px;color:var(--clr-muted);text-align:center;margin-bottom:8px}
+    .game-reward-hint{font-size:12px;color:var(--clr-gold);text-align:center;margin-bottom:8px}
+    .game-result{text-align:center;padding:16px;animation:popIn .3s cubic-bezier(.34,1.56,.64,1)}
+    .game-result.hidden{display:none!important}
+    .result-icon{font-size:40px;margin-bottom:8px}
+    .result-score{font-family:var(--font-display);font-size:40px;font-weight:900;color:var(--clr-gold)}
+    .result-label{font-size:14px;color:var(--clr-muted);margin-bottom:6px}
+    .result-reward{font-size:15px;font-weight:600;color:#39ff14;margin-bottom:12px}
+    .result-unlock{font-size:12px;color:var(--clr-green);margin-bottom:16px}
+    .btn-primary{display:flex;align-items:center;justify-content:center;gap:8px;padding:14px 28px;border-radius:24px;font-family:var(--font-display);font-size:14px;font-weight:700;letter-spacing:.06em;border:none;background:linear-gradient(135deg,var(--clr-accent),var(--clr-accent2));color:#fff;cursor:pointer;transition:opacity .15s,transform .15s;width:100%}
+    .btn-primary:hover{opacity:.9;transform:translateY(-1px)}
+    @keyframes popIn{from{opacity:0;transform:scale(.85)}to{opacity:1;transform:scale(1)}}
+    @keyframes mergeFlash{0%{transform:scale(1.15);box-shadow:0 0 20px var(--clr-gold)}100%{transform:scale(1)}}
+  </style>
+</head>
+<body>
+  <header id="site-header">
+    <div class="header-inner">
+      <div class="logo"><span class="logo-icon">⚡</span><span class="logo-text">NeonSpin</span></div>
+      <div class="header-right" style="font-size:13px;color:var(--clr-muted)">Game 5 of 8</div>
+    </div>
+  </header>
+
+  <main id="app">
+    <div class="game-page-wrap">
+      <a href="games.html" class="back-link">← Back to Games</a>
+      <div class="game-title-row">
+        <h1>🔢 2048</h1>
+        <p>Merge tiles to reach 2048. Score 200+ for coins!</p>
+      </div>
+
+      <div class="g2048-card">
+        <div class="g2048-header">
+          <div class="g2048-stats">
+            <div class="g2048-stat"><span class="gs-label">Score</span><span class="gs-val" id="g2048-score">0</span></div>
+            <div class="g2048-stat"><span class="gs-label">Best</span><span class="gs-val" id="g2048-best">0</span></div>
+          </div>
+          <button id="btn-2048-new" class="btn-sm">New Game</button>
+        </div>
+
+        <div id="grid-2048" class="grid-2048" aria-label="2048 game grid"></div>
+        <p class="swipe-hint">👆 Swipe or Arrow Keys to move</p>
+        <p class="game-reward-hint">Reach 2048 for 50 bonus coins!</p>
+
+        <div id="g2048-result" class="game-result hidden">
+          <div class="result-icon" id="g2048-result-icon">🏆</div>
+          <div class="result-score" id="g2048-final-score">0</div>
+          <div class="result-label" id="g2048-result-label">Game Over!</div>
+          <div class="result-reward" id="g2048-reward-msg"></div>
+          <button id="btn-2048-retry" class="btn-primary">🔄 Play Again</button>
+          <a href="games.html" style="display:block;text-align:center;margin-top:12px;color:var(--clr-muted);font-size:13px;">← Back to Hub</a>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <nav id="bottom-nav">
+    <a href="index.html" class="nav-btn"><span class="nav-icon">🏠</span><span class="nav-label">Home</span><span class="nav-indicator"></span></a>
+    <a href="games.html" class="nav-btn active"><span class="nav-icon">🎮</span><span class="nav-label">Games</span><span class="nav-indicator"></span></a>
+    <a href="leaderboard.html" class="nav-btn"><span class="nav-icon">🏆</span><span class="nav-label">Ranks</span><span class="nav-indicator"></span></a>
+    <a href="redeem.html" class="nav-btn"><span class="nav-icon">🎁</span><span class="nav-label">Rewards</span><span class="nav-indicator"></span></a>
+    <a href="profile.html" class="nav-btn"><span class="nav-icon">👤</span><span class="nav-label">Profile</span><span class="nav-indicator"></span></a>
+  </nav>
+
+  <script>
+  (() => {
+    const GAME_ID = 5;
+    const LS_BEST = 'ns_2048_best';
+
+    let _grid=[], _score=0, _best=parseInt(localStorage.getItem(LS_BEST)||'0',10), _won=false, _over=false;
+    let _tsx=0, _tsy=0;
+
+    function setText(id,v){ const e=document.getElementById(id); if(e) e.textContent=String(v); }
+    setText('g2048-best', _best);
+
+    function newGame(){
+      _grid=Array.from({length:4},()=>[0,0,0,0]);
+      _score=0; _won=false; _over=false;
+      addTile(); addTile(); render();
+      setText('g2048-score',0);
+      document.getElementById('g2048-result').classList.add('hidden');
+    }
+
+    function addTile(){
+      const empty=[];
+      for(let r=0;r<4;r++) for(let c=0;c<4;c++) if(_grid[r][c]===0) empty.push([r,c]);
+      if(!empty.length) return;
+      const [r,c]=empty[Math.floor(Math.random()*empty.length)];
+      _grid[r][c]=Math.random()<.9?2:4;
+    }
+
+    function rotR(g){return g[0].map((_,c)=>g.map(row=>row[c]).reverse());}
+    function rotL(g){return g[0].map((_,c)=>g.map(row=>row[row.length-1-c]));}
+
+    function mergeRow(row){
+      let arr=row.filter(v=>v!==0);
+      for(let i=0;i<arr.length-1;i++){
+        if(arr[i]===arr[i+1]){ arr[i]*=2; _score+=arr[i]; arr.splice(i+1,1); }
+      }
+      while(arr.length<4) arr.push(0);
+      return arr;
+    }
+
+    function move(dir){
+      if(_over) return;
+      const prev=_grid.map(r=>[...r]);
+      let g=_grid;
+      if(dir==='right') g=rotL(rotL(g));
+      if(dir==='up')    g=rotL(g);
+      if(dir==='down')  g=rotR(g);
+      g=g.map(r=>mergeRow(r));
+      if(dir==='right') g=rotR(rotR(g));
+      if(dir==='up')    g=rotR(g);
+      if(dir==='down')  g=rotL(g);
+      _grid=g;
+      const moved=_grid.some((row,r)=>row.some((v,c)=>v!==prev[r][c]));
+      if(moved){
+        addTile(); render();
+        setText('g2048-score',_score);
+        if(_score>_best){ _best=_score; localStorage.setItem(LS_BEST,String(_best)); setText('g2048-best',_best); }
+        if(!_won && _grid.flat().includes(2048)){ _won=true; endGame(true); }
+        else if(!canMove()){ _over=true; endGame(false); }
+      }
+    }
+
+    function canMove(){
+      for(let r=0;r<4;r++) for(let c=0;c<4;c++){
+        if(_grid[r][c]===0) return true;
+        if(c<3&&_grid[r][c]===_grid[r][c+1]) return true;
+        if(r<3&&_grid[r][c]===_grid[r+1][c]) return true;
+      }
+      return false;
+    }
+
+    function render(){
+      const el=document.getElementById('grid-2048');
+      if(!el) return;
+      el.innerHTML=_grid.flat().map(v=>`<div class="cell-2048" data-val="${v}">${v>0?v:''}</div>`).join('');
+    }
+
+    function endGame(won){
+      const coins=won?50:_score>=1000?20:_score>=500?10:_score>=200?5:1;
+      setText('g2048-final-score',_score);
+      setText('g2048-result-label',won?'You reached 2048! 🎉':'Game Over!');
+      setText('g2048-reward-msg',`+${coins} Coins earned!`);
+      document.getElementById('g2048-result-icon').textContent=won?'🎉':'🎮';
+
+      // ── HYBRID SYNC: award coins to localStorage + Firebase ──
+      window.__ns_giveReward?.('coins', coins, won ? '🎉' : '🎮', won ? 'YOU WIN!' : 'Good Game!');
+
+      document.getElementById('g2048-result').classList.remove('hidden');
+    }
+
+    document.getElementById('btn-2048-new').addEventListener('click',newGame);
+    document.getElementById('btn-2048-retry').addEventListener('click',newGame);
+
+    document.addEventListener('keydown',e=>{
+      const map={ArrowUp:'up',ArrowDown:'down',ArrowLeft:'left',ArrowRight:'right'};
+      if(map[e.key]){ e.preventDefault(); move(map[e.key]); }
+    });
+
+    const grid=document.getElementById('grid-2048');
+    grid.addEventListener('touchstart',e=>{ _tsx=e.touches[0].clientX; _tsy=e.touches[0].clientY; },{passive:true});
+    grid.addEventListener('touchend',e=>{
+      const dx=e.changedTouches[0].clientX-_tsx, dy=e.changedTouches[0].clientY-_tsy;
+      if(Math.max(Math.abs(dx),Math.abs(dy))<20) return;
+      if(Math.abs(dx)>Math.abs(dy)) move(dx>0?'right':'left'); else move(dy>0?'down':'up');
+    },{passive:true});
+
+    newGame();
+    if(localStorage.getItem('ns_theme')==='light') document.body.classList.add('light-theme');
+  })();
+  </script>
+  <script type="module" src="game-bridge.js"></script>
+</body>
+</html>
