@@ -15,8 +15,8 @@
 
    2. window.__ns_giveReward(type, value, icon, label):
       Each game's endGame() calls this to award coins/EXP.
-      Step A — localStorage: setState() writes instantly (zero lag).
-      Step B — Firebase: syncUserStats() writes in background.
+      Now uses the centralized reward-system.js with validation,
+      limits, and anti-cheat protection.
 
    3. Dashboard (index.html / app.js) already:
       - Reads localStorage on boot  → instant display ✅
@@ -32,58 +32,58 @@
 
 'use strict';
 
-import { getState, setState, mergeProfile } from './state.js';
-import { levelFromExp }                     from './config.js';
-import { syncUserStats, initAuthObserver }  from './auth.js';
+import { mergeProfile } from './state.js';
+import { initAuthObserver }  from './auth.js';
+import { giveReward } from './reward-system.js';
 
 /* ── Global reward function ────────────────────────────────────────
    Called by each game page's endGame() function.
+   
+   NOW USES CENTRALIZED REWARD SYSTEM with:
+   ✅ Validation (max limits per game)
+   ✅ Anti-cheat detection
+   ✅ Comprehensive logging
+   ✅ Rate limiting
 
    @param {'coins'|'exp'|'spin'} type  — what to award
    @param {number}               value — how much to add
    @param {string}               [icon]  — emoji for future popups
    @param {string}               [label] — title for future popups
    ------------------------------------------------------------------ */
-window.__ns_giveReward = function giveReward(type, value, icon, label) {
-  const s = getState();
-  let patch = {};
-
-  switch (type) {
-    case 'coins':
-      patch = { coins: s.coins + Number(value) };
-      break;
-
-    case 'exp': {
-      const newExp = s.exp + Number(value);
-      patch = { exp: newExp, level: levelFromExp(newExp) };
-      break;
-    }
-
-    case 'spin':
-      patch = { spins: (s.spins || 0) + Number(value) };
-      break;
-
-    default:
-      console.warn('[game-bridge] Unknown reward type:', type);
-      return;
-  }
-
-  // STEP 1 — Write to localStorage immediately (zero UI delay)
-  setState(patch);
-
-  const next = getState();
-  console.info(
-    `[game-bridge] +${value} ${type} saved.`,
-    `coins=${next.coins}  exp=${next.exp}  level=${next.level}`
-  );
-
-  // STEP 2 — Sync to Firebase (non-blocking, best-effort)
-  // If Firebase is unavailable the value is still safe in localStorage
-  // and will sync the next time the user visits index.html.
-  syncUserStats(next).catch((err) => {
-    console.warn('[game-bridge] Firebase sync failed (safe — localStorage is up to date):', err);
+window.__ns_giveReward = function giveRewardLegacy(type, value, icon, label) {
+  const source = _inferGameSource();
+  
+  console.info(`[game-bridge] Giving reward: ${value} ${type} from ${source}`);
+  
+  const success = giveReward(type, value, source, { 
+    icon: icon || '🎮', 
+    label: label || 'Game Reward' 
   });
+  
+  if (!success) {
+    console.error('[game-bridge] Reward failed validation!');
+  }
+  
+  return success;
 };
+
+/* ── Infer game source from URL ────────────────────────────────────
+   Maps the current page to a reward source identifier.
+   This is used for applying correct reward limits.
+   ------------------------------------------------------------------ */
+function _inferGameSource() {
+  const path = window.location.pathname.toLowerCase();
+  
+  if (path.includes('2048'))     return 'game_2048';
+  if (path.includes('memory'))   return 'game_memory';
+  if (path.includes('tile'))     return 'game_tile';
+  if (path.includes('reaction')) return 'game_reaction';
+  if (path.includes('lucky'))    return 'game_lucky';
+  if (path.includes('scratch'))  return 'game_scratch';
+  
+  console.warn('[game-bridge] Unknown game page:', path);
+  return 'game_unknown';
+}
 
 /* ── Silent auth init on page load ────────────────────────────────
    Merges the Firebase profile into localStorage before the user
@@ -95,10 +95,11 @@ initAuthObserver(
   function onUserReady(profile) {
     if (profile) {
       mergeProfile(profile);
-      console.info('[game-bridge] Firebase profile merged into localStorage state.');
+      console.info('[game-bridge] ✅ Firebase profile merged into localStorage state.');
     }
   },
   function onUserGone() {
     // Guest play — localStorage state is still used and updated. Fine.
+    console.info('[game-bridge] Guest mode active — rewards saved locally only.');
   }
 );
